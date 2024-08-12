@@ -1,0 +1,116 @@
+import mariadb
+
+class DBConnector:
+    def __init__(self ):
+        self.host = 'localhost'
+        self.user = 'root'
+        self.password = 'teste123'
+        self.database = 'iscte_spot'
+        self.port = 3306
+
+    def connect(self):
+        try:
+            connection = mariadb.connect(
+                user=self.user,
+                password=self.password,
+                host=self.host,
+                port=self.port,
+                database=self.database
+            )
+            return connection
+        except mariadb.Error as e:
+            print(f"Error connecting to MariaDB Platform: {e}")
+            return None
+
+    def execute_query(self, query, args=None):
+        ''' Execute queries by query name
+
+            query:
+                Auth:
+                    READ
+                        'get_user_by_name'      args:username       |       return: user id if exits if not, return false
+                        'get_user_password'     args:password       |       return: password id if exits if not, return false
+                        'get_user_by_id'        args:user_id        |       return: all parameters
+                    CREATE
+                        'create_user_employee'  args: {username, email, commission_percentage}
+                        'create_user_admin'     args: {username, email}
+                        'create_company'        args: {company_name, n_employees}
+                    UPDATE
+
+                    DELETE
+                        'delete_user_by_id'     args:user_id
+                        'delete_company_by_id'  args:company_id
+        '''
+        print(f'DB query selceted: {query}, args: {args}')
+        connection = self.connect()
+        if connection is None:
+            return None
+
+        cursor = connection.cursor(dictionary=True)
+        result = None
+        try:
+            if query == 'get_user_by_name':
+                cursor.execute("SELECT UserID FROM Users WHERE Username = ?", (args,))
+                result = cursor.fetchone()
+                print(result)
+                if isinstance(result, tuple):
+                    return result[0]['UserID']
+                else:
+                    return result["UserID"]
+
+            elif query == 'get_user_password':
+                cursor.execute("SELECT PasswordHash FROM Users WHERE PasswordHash = ?", (args,))
+                result = cursor.fetchone()
+                print(result)
+                if isinstance(result, tuple):
+                    return result[0]['PasswordHash']
+                else:
+                    return result['PasswordHash']
+
+            elif query == 'get_user_by_id':
+                cursor.execute("SELECT * FROM Users WHERE UserID = ?", (args,))
+                result = cursor.fetchone()
+
+            elif query == 'create_user_employee':
+                cursor.execute(
+                    "INSERT INTO Users (Username, Email, CommissionPercentage) VALUES (?, ?, ?)",
+                    (args['username'], args['email'], args['commission_percentage'])
+                )
+                connection.commit()
+                result = cursor.lastrowid
+
+            elif query == 'create_user_admin':
+                cursor.execute(
+                    "INSERT INTO Users (Username, Email) VALUES (?, ?)",
+                    (args['username'], args['email'])
+                )
+                connection.commit()
+                result = cursor.lastrowid
+
+            elif query == 'create_company':
+                cursor.execute(
+                    "INSERT INTO Companies (CompanyName, NumberOfEmployees) VALUES (?, ?)",
+                    (args['company_name'], args['n_employees'])
+                )
+                connection.commit()
+                result = cursor.lastrowid
+
+            elif query == 'delete_user_by_id':
+                cursor.execute("DELETE FROM Users WHERE UserID = ?", (args['user_id'],))
+                connection.commit()
+                result = cursor.rowcount
+
+            elif query == 'delete_company_by_id':
+                cursor.execute("DELETE FROM Companies WHERE CompanyID = ?", (args['company_id'],))
+                connection.commit()
+                result = cursor.rowcount
+
+        except mariadb.Error as e:
+            print(f"Error: {e}")
+            result = None
+
+        finally:
+            cursor.close()
+            connection.close()
+
+        return result
