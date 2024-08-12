@@ -1,5 +1,5 @@
 import mariadb
-
+import sys
 class DBConnector:
     def __init__(self ):
         self.host = 'localhost'
@@ -33,10 +33,10 @@ class DBConnector:
                         'get_user_by_id'        args:user_id        |       return: all parameters
                     CREATE
                         'create_user_employee'  args: {username, email, commission_percentage}
-                        'create_user_admin'     args: {username, email}
+                        'create_user_admin'     args: {username, password, email}
                         'create_company'        args: {company_name, n_employees}
                     UPDATE
-
+                        'update_user_password'  args: {user_id, new_password}
                     DELETE
                         'delete_user_by_id'     args:user_id
                         'delete_company_by_id'  args:company_id
@@ -52,7 +52,6 @@ class DBConnector:
             if query == 'get_user_by_name':
                 cursor.execute("SELECT UserID FROM Users WHERE Username = ?", (args,))
                 result = cursor.fetchone()
-                print(result)
                 if isinstance(result, tuple):
                     return result[0]['UserID']
                 else:
@@ -61,7 +60,6 @@ class DBConnector:
             elif query == 'get_user_password':
                 cursor.execute("SELECT PasswordHash FROM Users WHERE PasswordHash = ?", (args,))
                 result = cursor.fetchone()
-                print(result)
                 if isinstance(result, tuple):
                     return result[0]['PasswordHash']
                 else:
@@ -73,7 +71,7 @@ class DBConnector:
 
             elif query == 'create_user_employee':
                 cursor.execute(
-                    "INSERT INTO Users (Username, Email, CommissionPercentage) VALUES (?, ?, ?)",
+                    "INSERT INTO Users (Username, Email, CommissionPercentage, CreatedAt) VALUES (?, ?, ?, CURRENT_TIMESTAMP)",
                     (args['username'], args['email'], args['commission_percentage'])
                 )
                 connection.commit()
@@ -81,20 +79,41 @@ class DBConnector:
 
             elif query == 'create_user_admin':
                 cursor.execute(
-                    "INSERT INTO Users (Username, Email) VALUES (?, ?)",
-                    (args['username'], args['email'])
+                    "INSERT INTO Users (Username, PasswordHash, Email, CreatedAt) VALUES (?, ?, ?, CURRENT_TIMESTAMP);",
+                    (args['username'], args['password'],args['email'])
                 )
                 connection.commit()
                 result = cursor.lastrowid
+                if isinstance(result, tuple):
+                    return result[0]
+                else:
+                    return result
 
             elif query == 'create_company':
                 cursor.execute(
-                    "INSERT INTO Companies (CompanyName, NumberOfEmployees) VALUES (?, ?)",
-                    (args['company_name'], args['n_employees'])
+                    "INSERT INTO Companies (CompanyName, NumberOfEmployees, AdminUserID, Revenue) VALUES (?, ?, ?, ?)",
+                    (args['comp_name'], args['num_employees'], args['user_id'], 0)
                 )
                 connection.commit()
                 result = cursor.lastrowid
+                if isinstance(result, int):
+                    return True
+                else:
+                    return False
 
+            elif query == 'update_user_password':
+                cursor.execute(
+                    "UPDATE Users SET PasswordHash = ? WHERE UserID = ?;",
+                    (args["new_password"], args["user_id"])
+                )
+                connection.commit()
+                result = cursor.rowcount
+                if isinstance(result, tuple):
+                    result = result[0]
+                if cursor.rowcount > 0:
+                    return True
+                else:
+                    return False
             elif query == 'delete_user_by_id':
                 cursor.execute("DELETE FROM Users WHERE UserID = ?", (args['user_id'],))
                 connection.commit()
