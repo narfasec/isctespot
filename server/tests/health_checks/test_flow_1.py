@@ -144,3 +144,80 @@ if retire_data['status'] == 'Ok':
 else:
     test_output_status('fail', 'Retire failed')
 
+# Create new client
+test_output_status('info', 'Testing new client')
+new_client_url = f'{base_url}/clients/new'
+new_client_payload = {
+    'user_id': 1,
+    'comp_id': 3,
+    'first_name': 'Roger',
+    'last_name': 'Schmidt',
+    'email': 'roger.schmidt@benfica.pt',
+    'phone_number': '+351963023202',
+    'address': 'Top top level street',
+    'city': 'Lisbon',
+    'country': 'Germany',
+    'token': AUTH_TOKEN
+}
+new_client_response = requests.post(new_client_url, json=new_client_payload)
+new_client_data = new_client_response.json()
+if new_client_data['status'] == 'Ok':
+    client_id = new_client_data['client_id']
+    test_output_status('pass', 'New client  success')
+else:
+    test_output_status('fail', 'New client failed')
+# Trying to create same client
+new_client_response = requests.post(new_client_url, json=new_client_payload)
+new_client_data = new_client_response.json()
+if new_client_data['status'] == 'Ok':
+    test_output_status('fail', 'Client was duplicated')
+else:
+    test_output_status('pass', 'Failed to be created again')
+
+# Delete client
+test_output_status('info', 'Testing delete client')
+delete_client_url = f'{base_url}/clients/delete'
+delete_client_payload = {
+    'user_id': 1,
+    'token': ADMIN_AUTH_TOKEN,
+    'client_id': client_id
+}
+delete_client_response = requests.post(delete_client_url, json=delete_client_payload)
+delete_client_data = delete_client_response.json()
+if delete_client_data['status'] == 'Ok':
+    client_id = delete_client_data['client_id']
+    test_output_status('pass', 'Delete client  success')
+else:
+    test_output_status('fail', 'Delete client failed')
+
+# Admin overview
+test_output_status('info', 'Testing analytics')
+analytics_url = f'{base_url}/analytics'
+analytics_payload = {
+    'user_id': 3,
+    'token': ADMIN_AUTH_TOKEN,
+    'company_id': 1
+}
+analytics_response = requests.get(analytics_url, json=analytics_payload)
+analytics_data = analytics_response.json()
+if analytics_data['status'] == 'Ok':
+    sales = analytics_data['sales']
+    print(sales)
+    test_output_status('pass', 'Company analytics success')
+else:
+    test_output_status('fail', 'Company analytics failed')
+
+# User overview
+test_output_status('info', 'Testing user overview')
+user_overview_url = f'{base_url}/user/overview'
+user_overview_payload = {
+    'user_id': 3,
+    'token': AUTH_TOKEN,
+}
+user_overview_response = requests.get(user_overview_url, json=user_overview_payload)
+user_overview_data = user_overview_response.json()
+if user_overview_data['status'] == 'Ok':
+    sales = user_overview_data['sales']
+    test_output_status('pass', 'User overview success')
+else:
+    test_output_status('fail', 'User overview failed')
