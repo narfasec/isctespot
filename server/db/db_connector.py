@@ -28,18 +28,19 @@ class DBConnector:
             query:
                 Auth:
                     READ
-                        'get_user_by_name'      args:username       |       return: user id if exits if not, return false
-                        'get_user_password'     args:password       |       return: password id if exits if not, return false
-                        'get_user_by_id'        args:user_id        |       return: all parameters
+                        'get_user_by_name'          args:username       |       return: user id if exits if not, return false
+                        'get_user_password'         args:password       |       return: password id if exits if not, return false
+                        'get_user_by_id'            args:user_id        |       return: all parameters
                     CREATE
-                        'create_user_employee'  args: {username, email, commission_percentage}
-                        'create_user_admin'     args: {username, password, email}
-                        'create_company'        args: {company_name, n_employees}
+                        'create_user_employee'      args: {username, email, company_id}
+                        'create_user_admin'         args: {username, password, email}
+                        'create_company'            args: {company_name, n_employees}
                     UPDATE
-                        'update_user_password'  args: {user_id, new_password}
+                        'update_user_password'      args: {user_id, new_password}
                     DELETE
-                        'delete_user_by_id'     args:user_id
-                        'delete_company_by_id'  args:company_id
+                        'delete_users_by_comp_id'   args: {user_id, company_id}
+                        'delete_user_by_id'         args:user_id
+                        'delete_company_by_id'      args:company_id
         '''
         print(f'DB query selceted: {query}, args: {args}')
         connection = self.connect()
@@ -71,12 +72,17 @@ class DBConnector:
 
             elif query == 'create_user_employee':
                 cursor.execute(
-                    "INSERT INTO Users (Username, Email, CommissionPercentage, CreatedAt) VALUES (?, ?, ?, CURRENT_TIMESTAMP)",
-                    (args['username'], args['email'], args['commission_percentage'])
+                    "INSERT INTO Users (Username, PasswordHash, Email, CompanyID, CommissionPercentage, CreatedAt) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)",
+                    (args['username'], 'T3MP-password-32',args['email'], args['comp_id'], 5)
                 )
                 connection.commit()
                 result = cursor.lastrowid
-
+                print(result)
+                if isinstance(result, int):
+                    return True
+                else:
+                    return False
+                
             elif query == 'create_user_admin':
                 cursor.execute(
                     "INSERT INTO Users (Username, PasswordHash, Email, CreatedAt) VALUES (?, ?, ?, CURRENT_TIMESTAMP);",
@@ -96,10 +102,10 @@ class DBConnector:
                 )
                 connection.commit()
                 result = cursor.lastrowid
-                if isinstance(result, int):
-                    return True
+                if isinstance(result, tuple):
+                    return result[0]
                 else:
-                    return False
+                    return result
 
             elif query == 'update_user_password':
                 cursor.execute(
@@ -114,15 +120,39 @@ class DBConnector:
                     return True
                 else:
                     return False
-            elif query == 'delete_user_by_id':
-                cursor.execute("DELETE FROM Users WHERE UserID = ?", (args['user_id'],))
+            
+            elif query == 'delete_users_by_comp_id':
+                cursor.execute("DELETE FROM Users WHERE CompanyID = ?", (args,))
                 connection.commit()
                 result = cursor.rowcount
+                if isinstance(result, tuple):
+                    result = result[0]
+                if cursor.rowcount > 0:
+                    return True
+                else:
+                    return False
+                
+            elif query == 'delete_user_by_id':
+                cursor.execute("DELETE FROM Users WHERE UserID = ?", (args,))
+                connection.commit()
+                result = cursor.rowcount
+                if isinstance(result, tuple):
+                    result = result[0]
+                if cursor.rowcount > 0:
+                    return True
+                else:
+                    return False
 
             elif query == 'delete_company_by_id':
-                cursor.execute("DELETE FROM Companies WHERE CompanyID = ?", (args['company_id'],))
+                cursor.execute("DELETE FROM Companies WHERE CompanyID = ?", (args,))
                 connection.commit()
                 result = cursor.rowcount
+                if isinstance(result, tuple):
+                    result = result[0]
+                if cursor.rowcount > 0:
+                    return True
+                else:
+                    return False
 
         except mariadb.Error as e:
             print(f"Error: {e}")

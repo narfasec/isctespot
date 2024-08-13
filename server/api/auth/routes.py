@@ -45,7 +45,7 @@ def signup():
     ''' Signup function, create new user and company'''
     dbc = DBConnector()
     dict_data = request.get_json()
-
+    user_id = 0
     result = dbc.execute_query('create_user_admin', args={
         "username": dict_data['username'],
         "password": dict_data['password'],
@@ -63,11 +63,45 @@ def signup():
         "comp_name": dict_data['comp_name'],
         "num_employees": dict_data['num_employees']
     })
+    if isinstance(result,int):
+        return jsonify({'status': 'Ok', 'comp_id': result, 'user_id': user_id}), 200
+    else:
+        return jsonify({'status': 'Bad request'}), 400
+
+@auth.route('/new-employee', methods=['POST'])
+def new_employee():
+    ''' Create new employee function '''
+    dbc = DBConnector()
+    dict_data = request.get_json()
+    if dict_data['token'] != current_app.config['ADMIN_AUTH_TOKEN']:
+        return jsonify({'status': 'Unauthorized'}), 403
+    result = dbc.execute_query('create_user_employee', args={
+        'username': dict_data['username'],
+        'email': dict_data['email'],
+        'comp_id': dict_data['comp_id']
+    })
+    if result is True:
+        return jsonify({'status': 'Ok'})
+    else:
+        return jsonify({'status': 'Bad requests'})
+
+@auth.route('/retire', methods=['POST'])
+def retire():
+    ''' Retire function, delete company and all employees '''
+    dbc = DBConnector()
+    dict_data = request.get_json()
+    if dict_data['token'] != current_app.config['ADMIN_AUTH_TOKEN']:
+        return jsonify({'status': 'Unauthorized'}), 403
+    result = dbc.execute_query(query='delete_users_by_comp_id', args=dict_data['comp_id'])
+    if result is False:
+        return jsonify({'status': 'Bad request'}), 400
+    result = dbc.execute_query('delete_company_by_id', dict_data['comp_id'])
+    if result is not True:
+        return jsonify({'status': "Bad request"}), 400
+    result = dbc.execute_query('delete_user_by_id', dict_data['user_id'])
+    if result is not True:
+        return jsonify({'status': "Bad request"}), 400
     if result is True:
         return jsonify({'status': 'Ok'}), 200
     else:
         return jsonify({'status': 'Bad request'}), 400
-
-# @auth.route('/retire', methods=['POST'])
-# def retire():
-    

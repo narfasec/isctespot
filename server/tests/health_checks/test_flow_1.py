@@ -66,7 +66,41 @@ signup_payload = {
 }
 signup_response = requests.post(signup_url, json=signup_payload)
 signup_data = signup_response.json()
+comp_id = 0
 if signup_data['status'] == 'Ok':
+    comp_id = signup_data['comp_id']
+    user_id = signup_data['user_id']
     test_output_status('pass', 'Signup  success')
 else:
     test_output_status('fail', 'Signup failed')
+
+# Admin adds new users
+test_output_status('info', 'Employee creation')
+new_employee_url = f'{base_url}/new-employee'
+new_employee_payload = {
+    'username': 'employeetest',
+    'email': 'employeetest@email.com',
+    'comp_id': comp_id,
+    'token': ADMIN_AUTH_TOKEN,
+}
+new_employee_response = requests.post(new_employee_url, json=new_employee_payload)
+new_employee_data = new_employee_response.json()
+if new_employee_data['status'] == 'Ok':
+    test_output_status('pass', 'Employee creation success')
+else:
+    test_output_status('fail', 'Employee creation failed')
+
+# Retire
+test_output_status('info', 'Testing retire')
+retire_url = f'{base_url}/retire'
+retire_payload = {
+    'user_id': user_id,
+    'comp_id': comp_id,
+    'token': ADMIN_AUTH_TOKEN,
+}
+retire_response = requests.post(retire_url, json=retire_payload)
+retire_data = retire_response.json()
+if retire_data['status'] == 'Ok':
+    test_output_status('pass', 'Retire  success')
+else:
+    test_output_status('fail', 'Retire failed')
