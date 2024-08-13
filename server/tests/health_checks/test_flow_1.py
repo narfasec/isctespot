@@ -30,7 +30,6 @@ else:
     test_output_status('fail', 'Failed to Login user')
 
 # User resets password
-test_output_status('info', 'Testing User resting password')
 reset_password_url = f'{base_url}/user/reset-password'
 reset_password_payload = {
     'user_id': user_id,
@@ -48,11 +47,34 @@ reset_password_payload["new_password"] = reset_password_payload["current_passwor
 reset_password_payload["current_password"] = '1234'
 reset_password_response = requests.post(reset_password_url, json=reset_password_payload)
 reset_password_data = reset_password_response.json()
-user_id = 0
 if reset_password_data['status'] == 'Ok':
     test_output_status('pass', 'Reset for backward compatibile')
 else:
     test_output_status('fail', 'Failed to reset password')
+
+# List Clients
+test_output_status('info', 'Testing list clients')
+list_clients_url = f'{base_url}/clients'
+list_clients_payload = {
+    'user_id': user_id,
+}
+list_clients_response = requests.get(list_clients_url, json=list_clients_payload)
+list_clients_data = list_clients_response.json()
+if list_clients_data['status'] == 'Ok':
+    test_output_status('pass', 'List clients  success')
+    print(list_clients_data['clients'])
+else:
+    test_output_status('fail', 'List clients failed')
+    
+# User logs out
+logout_url = f'{base_url}/logout'
+logout_payload = {'user_id': user_id}
+logout_response = requests.post(logout_url, json=logout_payload)
+logout_data = logout_response.json()
+if logout_data['status'] == 'Ok':
+    test_output_status('pass', 'Logout successful')
+else:
+    test_output_status('fail', 'Failed to logout user')
 
 # Signup
 test_output_status('info', 'Testing Signup')
@@ -85,10 +107,27 @@ new_employee_payload = {
 }
 new_employee_response = requests.post(new_employee_url, json=new_employee_payload)
 new_employee_data = new_employee_response.json()
+employee_id = 0
 if new_employee_data['status'] == 'Ok':
+    employee_id = new_employee_data['employee_id']
     test_output_status('pass', 'Employee creation success')
 else:
     test_output_status('fail', 'Employee creation failed')
+
+# Delete employee
+test_output_status('info', 'Testing employee deletion')
+delete_employee_url = f'{base_url}/delete-employee'
+delete_employee_payload = {
+    'user_id': user_id,
+    'employee_id': employee_id,
+    'token': ADMIN_AUTH_TOKEN,
+}
+delete_employee_response = requests.post(delete_employee_url, json=delete_employee_payload)
+delete_employee_data = delete_employee_response.json()
+if delete_employee_data['status'] == 'Ok':
+    test_output_status('pass', 'Delete employee  success')
+else:
+    test_output_status('fail', 'Delete employee failed')
 
 # Retire
 test_output_status('info', 'Testing retire')
@@ -104,3 +143,4 @@ if retire_data['status'] == 'Ok':
     test_output_status('pass', 'Retire  success')
 else:
     test_output_status('fail', 'Retire failed')
+

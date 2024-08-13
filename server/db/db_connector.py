@@ -24,13 +24,13 @@ class DBConnector:
 
     def execute_query(self, query, args=None):
         ''' Execute queries by query name
-
             query:
                 Auth:
                     READ
                         'get_user_by_name'          args:username       |       return: user id if exits if not, return false
                         'get_user_password'         args:password       |       return: password id if exits if not, return false
                         'get_user_by_id'            args:user_id        |       return: all parameters
+                        'get_clients_list           args:company_id     |       return: list of clients
                     CREATE
                         'create_user_employee'      args: {username, email, company_id}
                         'create_user_admin'         args: {username, password, email}
@@ -65,10 +65,29 @@ class DBConnector:
                     return result[0]['PasswordHash']
                 else:
                     return result['PasswordHash']
-
             elif query == 'get_user_by_id':
                 cursor.execute("SELECT * FROM Users WHERE UserID = ?", (args,))
                 result = cursor.fetchone()
+            
+            elif query == 'get_clients_list':
+                cursor.execute(
+                    "SELECT ClientID, FirstName, LastName, Email, PhoneNumber, Address, City, Country FROM Clients WHERE CompanyID = ?",
+                    (args,)
+                )
+                result = cursor.fetchall()
+                if isinstance(result, list):
+                    return result
+                else:
+                    return False
+
+            elif query == 'get_compnay_id_by_user':
+                cursor.execute('SELECT CompanyID FROM Companies WHERE AdminUserID = ?', (args,))
+                result = cursor.fetchone()
+                print(result)
+                if isinstance(result, tuple):
+                    return result[0]['CompanyID']
+                else:
+                    return result["CompanyID"]
 
             elif query == 'create_user_employee':
                 cursor.execute(
@@ -78,11 +97,11 @@ class DBConnector:
                 connection.commit()
                 result = cursor.lastrowid
                 print(result)
-                if isinstance(result, int):
-                    return True
+                if isinstance(result, tuple):
+                    return result[0]
                 else:
-                    return False
-                
+                    return result
+
             elif query == 'create_user_admin':
                 cursor.execute(
                     "INSERT INTO Users (Username, PasswordHash, Email, CreatedAt) VALUES (?, ?, ?, CURRENT_TIMESTAMP);",
@@ -120,22 +139,29 @@ class DBConnector:
                     return True
                 else:
                     return False
-            
-            elif query == 'delete_users_by_comp_id':
-                cursor.execute("DELETE FROM Users WHERE CompanyID = ?", (args,))
+
+            elif query == 'update_user_activity':
+                if args['active']:
+                    cursor.execute("UPDATE Users SET LastLogin = CURRENT_TIMESTAMP, isActive = True WHERE UserID = ?", (args['user_id'],))
+                else:
+                    cursor.execute("UPDATE Users SET LastLogout = CURRENT_TIMESTAMP, isActive = False WHERE UserID = ?", (args['user_id'],))
                 connection.commit()
                 result = cursor.rowcount
                 if isinstance(result, tuple):
                     result = result[0]
-                if cursor.rowcount > 0:
-                    return True
-                else:
-                    return False
+                return result
                 
+            elif query == 'delete_users_by_comp_id':
+                cursor.execute("DELETE FROM Users WHERE CompanyID = ?", (args,))
+                connection.commit()
+                result = cursor.rowcount
+                return True
+
             elif query == 'delete_user_by_id':
                 cursor.execute("DELETE FROM Users WHERE UserID = ?", (args,))
                 connection.commit()
                 result = cursor.rowcount
+                print(result)
                 if isinstance(result, tuple):
                     result = result[0]
                 if cursor.rowcount > 0:

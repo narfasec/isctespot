@@ -16,8 +16,26 @@ def login():
         return jsonify({'status': 'Bad request'}), 400
     _password = dbc.execute_query(query='get_user_password', args=password)
     if password == _password:
+        result = dbc.execute_query(query='update_user_activity', args={
+            'user_id': _id,
+            'active': True
+        })
         return jsonify({'status': 'Ok', 'user_id': _id}), 200
     return jsonify({'status': 'Bad credentials'}), 403
+
+@auth.route('/logout', methods=['POST'])
+def logout():
+    ''' Logout function'''
+    dbc = DBConnector()
+    dict_data = request.get_json()
+    _id = dbc.execute_query(query='update_user_activity', args={
+        'user_id': dict_data['user_id'],
+        'active': False
+    })
+    if not isinstance(_id, int):
+        return jsonify({'status': 'Bad request'}), 400
+    else:
+        return jsonify({'status': 'Ok'}), 200
 
 @auth.route('/user/reset-password', methods=['POST'])
 def reset_password():
@@ -80,8 +98,8 @@ def new_employee():
         'email': dict_data['email'],
         'comp_id': dict_data['comp_id']
     })
-    if result is True:
-        return jsonify({'status': 'Ok'})
+    if isinstance(result, int):
+        return jsonify({'status': 'Ok', 'employee_id': result})
     else:
         return jsonify({'status': 'Bad requests'})
 
@@ -105,3 +123,16 @@ def retire():
         return jsonify({'status': 'Ok'}), 200
     else:
         return jsonify({'status': 'Bad request'}), 400
+
+@auth.route('/delete-employee', methods=['POST'])
+def delete_employee():
+    ''' Delete employee function '''
+    dbc = DBConnector()
+    dict_data = request.get_json()
+    if dict_data['token'] != current_app.config['ADMIN_AUTH_TOKEN']:
+        return jsonify({'status': 'Unauthorized'}), 403
+    result = dbc.execute_query('delete_user_by_id', dict_data['employee_id'])
+    if result is True:
+        return jsonify({'status': 'Ok'}), 200
+    else:
+        return jsonify({'status': "Bad request"}), 400
