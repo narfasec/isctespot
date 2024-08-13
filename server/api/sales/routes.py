@@ -4,7 +4,7 @@ import json
 
 sales = Blueprint('sales', __name__)
 
-@sales.route('/user/overview', methods=['GET'])
+@sales.route('/user/overview', methods=['GET', 'POST'])
 def list_user_sales():
     ''' List user sales function'''
     dbc = DBConnector()

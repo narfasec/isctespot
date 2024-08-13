@@ -65,7 +65,7 @@ if list_clients_data['status'] == 'Ok':
     print(list_clients_data['clients'])
 else:
     test_output_status('fail', 'List clients failed')
-    
+
 # User logs out
 logout_url = f'{base_url}/logout'
 logout_payload = {'user_id': user_id}

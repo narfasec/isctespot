@@ -11,7 +11,7 @@ def create_app(config_file='settings.py'):
     app.config.from_pyfile(config_file)
     CORS(auth, origins=["*"])
     CORS(clients, origins=["*"])
-    CORS(company, origins=["*"])
+    CORS(sales, origins=["*"])
     CORS(company, origins=["*"])
     app.register_blueprint(auth)
     app.register_blueprint(company)

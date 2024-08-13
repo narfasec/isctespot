@@ -57,18 +57,25 @@ class DBConnector:
             if query == 'get_user_by_name':
                 cursor.execute("SELECT UserID FROM Users WHERE Username = ?", (args,))
                 result = cursor.fetchone()
-                if isinstance(result, tuple):
-                    return result[0]['UserID']
-                else:
-                    return result["UserID"]
-
+                try:
+                    if isinstance(result, tuple):
+                        return result[0]['UserID']
+                    else:
+                        return result["UserID"]
+                except TypeError:
+                    return False
+                
             elif query == 'get_user_password':
                 cursor.execute("SELECT PasswordHash FROM Users WHERE PasswordHash = ?", (args,))
                 result = cursor.fetchone()
-                if isinstance(result, tuple):
-                    return result[0]['PasswordHash']
-                else:
-                    return result['PasswordHash']
+                try:
+                    if isinstance(result, tuple):
+                        return result[0]['PasswordHash']
+                    else:
+                        return result['PasswordHash']
+                except TypeError:
+                    return False
+
             elif query == 'get_user_by_id':
                 cursor.execute("SELECT * FROM Users WHERE UserID = ?", (args,))
                 result = cursor.fetchone()
