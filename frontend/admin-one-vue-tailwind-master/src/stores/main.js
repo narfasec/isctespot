@@ -5,7 +5,6 @@ import axios from 'axios'
 export const useMainStore = defineStore('main', () => {
   const userName = ref('John Doe')
   const userEmail = ref('doe.doe.doe@example.com')
-
   const userAvatar = computed(
     () =>
       `https://api.dicebear.com/7.x/avataaars/svg?seed=${userEmail.value.replace(
@@ -15,10 +14,10 @@ export const useMainStore = defineStore('main', () => {
   )
 
   const isFieldFocusRegistered = ref(false)
-
   const clients = ref([])
   const history = ref([])
   const userOverview = ref([])
+  const adminOverview = ref([])
 
   function setUser(payload) {
     if (payload.name) {
@@ -39,7 +38,7 @@ export const useMainStore = defineStore('main', () => {
         alert(error.message)
       })
   }
-
+4
   function fetchSampleHistory() {
     axios
       .get(`data-sources/history.json`)
@@ -51,17 +50,33 @@ export const useMainStore = defineStore('main', () => {
       })
   }
 
-  function getUserInfo(){
+  function getUserInfo() {
     const url = "http://localhost:5000/user/overview"
     const userOverviewPayload = {
-      user_id: 3,
-      token: 'W4N7CQ',
+      user_id: Number(localStorage.getItem('userId')),
+      token: localStorage.getItem('token'),
     };
     axios
       .post(url, userOverviewPayload)
       .then((r) => {
         this.userOverview = r.data
-        print(r.data)
+      })
+      .catch((error) => {
+        alert(error.message);
+    });
+  }
+
+  function getAdminOverview() {
+    const url = "http://localhost:5000/analytics"
+    const adminOverviewPayload = {
+      user_id: Number(localStorage.getItem('userId')),
+      token: localStorage.getItem('token'),
+      company_id: Number(localStorage.getItem('companyId'))
+    };
+    axios
+      .post(url, adminOverviewPayload)
+      .then((r) => {
+        this.adminOverview = r.data
       })
       .catch((error) => {
         alert(error.message);
@@ -76,9 +91,11 @@ export const useMainStore = defineStore('main', () => {
     clients,
     history,
     userOverview,
+    adminOverview,
     setUser,
     fetchSampleClients,
     fetchSampleHistory,
-    getUserInfo
+    getUserInfo,
+    getAdminOverview,
   }
 })

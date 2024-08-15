@@ -4,7 +4,7 @@ import json
 
 company = Blueprint('company', __name__)
 
-@company.route('/analytics', methods=['GET'])
+@company.route('/analytics', methods=['GET', 'POST'])
 def list_clients():
     ''' List clients function'''
     dbc = DBConnector()
@@ -12,6 +12,7 @@ def list_clients():
     if dict_data['token'] != current_app.config['ADMIN_AUTH_TOKEN']:
         return jsonify({'status': 'Unauthorised'}), 403
     results = dbc.execute_query(query='get_company_sales', args=dict_data['company_id'])
+    print(results)
     if isinstance(results, list):
         return jsonify({'status': 'Ok', 'sales': results}), 200
     return jsonify({'status': 'Bad request'}), 403

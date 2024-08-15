@@ -20,7 +20,15 @@ def login():
             'user_id': _id,
             'active': True
         })
-        return jsonify({'status': 'Ok', 'user_id': _id}), 200
+        is_admin = dbc.execute_query(query='get_user_admin', args=_id)
+        print(f'Admin --> {is_admin}')
+        if is_admin == 1:
+            is_admin = 'true'
+            token = current_app.config['ADMIN_AUTH_TOKEN']
+        else:
+            is_admin = 'false'
+            token = current_app.config['AUTH_TOKEN']
+        return jsonify({'status': 'Ok', 'user_id': _id, 'token': token, 'is_admin': is_admin}), 200
     return jsonify({'status': 'Bad credentials'}), 403
 
 @auth.route('/logout', methods=['POST'])
@@ -69,20 +77,32 @@ def signup():
         "password": dict_data['password'],
         "email": dict_data['email'],
         "comp_name": dict_data['comp_name'],
-        "num_employees": dict_data['num_employees']        
+        "num_employees": dict_data['num_employees']    
     })
     if isinstance(result,int):
         user_id = result
     else:
         return jsonify({'status': 'Bad request'}), 400
 
-    result = dbc.execute_query('create_company', args={
+    comp_id = dbc.execute_query('create_company', args={
         "user_id": user_id,
         "comp_name": dict_data['comp_name'],
         "num_employees": dict_data['num_employees']
     })
+    result = dbc.execute_query('update_user_comp_id', args={
+        'user_id': user_id,
+        'comp_id': comp_id
+    })
     if isinstance(result,int):
-        return jsonify({'status': 'Ok', 'comp_id': result, 'user_id': user_id}), 200
+        return jsonify(
+            {
+                'status': 'Ok',
+                'comp_id': comp_id,
+                'user_id': user_id,
+                'is_admin': True,
+                'token': current_app.config["ADMIN_AUTH_TOKEN"]
+            }
+        ), 200
     else:
         return jsonify({'status': 'Bad request'}), 400
 

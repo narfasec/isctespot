@@ -36,8 +36,15 @@ onMounted(() => {
 
 const mainStore = useMainStore()
 
-const clientBarItems = computed(() => mainStore.clients.slice(0, 4))
+// Fetch sample data
+mainStore.fetchSampleClients()
+mainStore.fetchSampleHistory()
 
+if (localStorage.isAdmin == 'true')
+  mainStore.getAdminOverview()
+else
+  mainStore.getUserInfo()
+const clientBarItems = computed(() => mainStore.clients.slice(0, 4))
 const transactionBarItems = computed(() => mainStore.history)
 </script>
 

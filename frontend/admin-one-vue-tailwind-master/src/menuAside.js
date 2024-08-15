@@ -13,7 +13,7 @@ import {
   mdiReact
 } from '@mdi/js'
 
-export default [
+const menuItems = [
   {
     to: '/dashboard',
     icon: mdiMonitor,
@@ -58,19 +58,28 @@ export default [
     to: '/error',
     label: 'Error',
     icon: mdiAlertCircle
-  },
-  {
-    label: 'Dropdown',
+  }
+]
+
+// Check if the user is an admin
+console.log('isAdmin')
+if (localStorage.getItem('isAdmin') === 'true') {
+  menuItems.push({
+    label: 'Company',
     icon: mdiViewList,
     menu: [
       {
-        label: 'Item One'
+        label: 'Analytics'
       },
       {
-        label: 'Item Two'
+        label: 'Overview'
       }
     ]
-  },
+  })
+}
+
+// Add the remaining static menu items
+menuItems.push(
   {
     href: 'https://github.com/justboil/admin-one-vue-tailwind',
     label: 'GitHub',
@@ -83,4 +92,6 @@ export default [
     icon: mdiReact,
     target: '_blank'
   }
-]
+)
+
+export default menuItems

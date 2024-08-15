@@ -5,6 +5,7 @@ import { gradientBgPurplePink } from '@/colors.js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
 import LayoutGuest from '@/layouts/LayoutGuest.vue'
+import BaseButton from '@/components/BaseButton.vue'
 
 const styles = ['white', 'basic']
 
@@ -14,44 +15,30 @@ darkModeStore.set(false)
 
 const router = useRouter()
 
-const handleStyleChange = (slug) => {
-  document.documentElement.classList.forEach((token) => {
-    if (token.indexOf('style') === 0) {
-      document.documentElement.classList.replace(token, `style-${slug}`)
-    }
-  })
-
-  router.push('/dashboard')
-}
 </script>
 
 <template>
   <LayoutGuest>
     <!-- Top Navigation Bar -->
-    <nav class="navbar">
+    <!-- <nav class="navbar">
       <ul class="nav-links">
         <li><a href="#about">About</a></li>
         <li><a href="#pricing">Pricing</a></li>
         <li><a href="#start">Start</a></li>
       </ul>
-    </nav>
-
+    </nav> -->
     <div :class="gradientBgPurplePink" class="flex min-h-screen items-center justify-center">
       <SectionMain>
         <h1 class="text-4xl md:text-5xl text-center text-white font-bold mt-12 mb-3 lg:mt-0">
-          Pick a style&hellip;
+          IscteSpot
         </h1>
         <h2 class="text-xl md:text-xl text-center text-white mb-12">
-          Style switching with a single
-          <code class="px-1.5 py-0.5 rounded bg-white bg-opacity-20">modifier</code>
+          Sales management easier than ever
         </h2>
         <div class="grid gap-6 grid-cols-1 lg:grid-cols-2 px-6 max-w-6xl mx-auto">
           <CardBox
             v-for="style in styles"
             :key="style"
-            class="cursor-pointer bg-gray-50"
-            is-hoverable
-            @click="handleStyleChange(style)"
           >
             <div class="mb-3 md:mb-6">
               <img
@@ -66,6 +53,24 @@ const handleStyleChange = (slug) => {
             </h1>
             <h2 class="text-lg md:text-xl">& Dark mode</h2>
           </CardBox>
+        </div>
+        <div class="grid gap-6 grid-cols-1 lg:grid-cols-3 px-6 max-w-6xl mx-auto mb-3 md:mb-6">
+          <div class="col-span-full flex justify-center mt-6">
+              <BaseButton
+                color="info"
+                label="Start Now"
+                :rounded-full=true
+                to="/login"
+              />
+          </div>
+        </div>
+        <div class="flex justify-center mt-6">
+          <img
+            :src="`https://imatch.pt/wp-content/uploads/2020/12/logo-iscte.png`"
+            width="500"
+            height="100"
+            alt="ISCTE Logo"
+          />
         </div>
       </SectionMain>
     </div>

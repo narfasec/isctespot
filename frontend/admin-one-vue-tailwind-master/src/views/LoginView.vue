@@ -21,7 +21,6 @@ const form = reactive({
 const router = useRouter()
 
 const submit = () => {
-  console.log("Something")
   const loginPayload = {
     username: form.login,
     password: form.pass,
@@ -29,8 +28,10 @@ const submit = () => {
 
   axios
     .post('http://localhost:5000/login', loginPayload)
-    .then((r) => {
-      console.log('Login successful:', r.data)
+    .then((response) => {
+      localStorage.setItem('token', response.data.token)
+      localStorage.setItem('userId', response.data.user_id)
+      localStorage.setItem('isAdmin', response.data.is_admin)
       router.push('/dashboard')
     })
     .catch((error) => {
@@ -72,8 +73,16 @@ const submit = () => {
         <template #footer>
           <BaseButtons>
             <BaseButton type="submit" color="info" label="Login" />
-            <BaseButton to="/dashboard" color="info" outline label="Back" />
+            <BaseButton to="/" color="info" outline label="Back" />
           </BaseButtons>
+          <div class="text-center mt-4">
+            <p class="text-sm text-gray-600">
+              Don’t have an account?
+              <router-link to="/signup" class="text-info font-semibold">
+                Sign up now
+              </router-link>
+            </p>
+          </div>
         </template>
       </CardBox>
     </SectionFullScreen>

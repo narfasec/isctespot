@@ -33,6 +33,7 @@ class DBConnector:
                         'get_user_by_id'            args:user_id        |       return: all parameters
                         'get_user_sales             args:user_id        |       return: list of sales by the user
                         'get_clients_list           args:company_id     |       return: list of clients
+                        'get_user_admin'            args:user_id        |       return: is_admin value (True or False)
                     CREATE
                         'create_user_employee'      args: {username, email, company_id}
                         'create_user_admin'         args: {username, password, email}
@@ -40,6 +41,7 @@ class DBConnector:
                         'create_client'             args: {first_name, last_name, email, phone_number, address, city, country, company_id}
                     UPDATE
                         'update_user_password'      args: {user_id, new_password}
+                        'update_user_comp_id'       args: {user_id, comp_id}
                     DELETE
                         'delete_users_by_comp_id'   args: {user_id, company_id}
                         'delete_user_by_id'         args: user_id
@@ -59,12 +61,16 @@ class DBConnector:
                 result = cursor.fetchone()
                 try:
                     if isinstance(result, tuple):
-                        return result[0]['UserID']
+                        result = result[0]['UserID']
+                        if result == 1:
+                            return True
                     else:
-                        return result["UserID"]
+                        result = result["UserID"]
+                        if result == 0:
+                            return False
                 except TypeError:
-                    return False
-                
+                    return 'TypeError'
+
             elif query == 'get_user_password':
                 cursor.execute("SELECT PasswordHash FROM Users WHERE PasswordHash = ?", (args,))
                 result = cursor.fetchone()
@@ -128,6 +134,20 @@ class DBConnector:
                 else:
                     return False
 
+            elif query == 'get_user_admin':
+                cursor.execute(
+                    """
+                    SELECT IsAdmin FROM Users WHERE UserID = ?;
+                    """,
+                    (args,)
+                )
+                result = cursor.fetchone()
+                print(result)
+                if isinstance(result, tuple):
+                    return result[0]['IsAdmin']
+                else:
+                    return result['IsAdmin']
+
             elif query == 'create_user_employee':
                 cursor.execute(
                     "INSERT INTO Users (Username, PasswordHash, Email, CompanyID, CommissionPercentage, CreatedAt) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)",
@@ -136,7 +156,7 @@ class DBConnector:
                 connection.commit()
                 result = cursor.lastrowid
                 print(result)
-                if isinstance(result, tuple):
+                if isinstance(result, int):
                     return result[0]
                 else:
                     return result
@@ -176,11 +196,25 @@ class DBConnector:
                     return result[0]
                 else:
                     return result
-                
+
             elif query == 'update_user_password':
                 cursor.execute(
                     "UPDATE Users SET PasswordHash = ? WHERE UserID = ?;",
                     (args["new_password"], args["user_id"])
+                )
+                connection.commit()
+                result = cursor.rowcount
+                if isinstance(result, tuple):
+                    result = result[0]
+                if cursor.rowcount > 0:
+                    return True
+                else:
+                    return False
+
+            elif query == 'update_user_comp_id':
+                cursor.execute(
+                    "UPDATE Users SET CompanyID = ? WHERE UserID = ?;",
+                    (args["comp_id"], args["user_id"])
                 )
                 connection.commit()
                 result = cursor.rowcount
@@ -230,7 +264,7 @@ class DBConnector:
                     return True
                 else:
                     return False
-            
+
             elif query == 'delete_client_by_id':
                 cursor.execute("DELETE FROM Clients WHERE ClientID = ?", (args,))
                 connection.commit()
