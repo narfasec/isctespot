@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useMainStore } from '@/stores/main'
 import { mdiEye, mdiTrashCan } from '@mdi/js'
+import CardBoxModalDeleteEmployee from '@/components/CardBoxModalDeleteEmployee.vue'
 import CardBoxModal from '@/components/CardBoxModal.vue'
 import TableCheckboxCell from '@/components/TableCheckboxCell.vue'
 import BaseLevel from '@/components/BaseLevel.vue'
@@ -17,13 +18,13 @@ defineProps({
 
 const mainStore = useMainStore()
 const router = useRouter()
-const items = computed(() => mainStore._clients)
+const items = computed(() => mainStore._employees)
 
 const isModalActive = ref(false)
 
 const isModalDangerActive = ref(false)
 
-const selectedClientId = ref()
+const selectedEmployeeId = ref()
 
 const perPage = ref(5)
 
@@ -61,29 +62,27 @@ const remove = (arr, cb) => {
   return newArr
 }
 
-const checked = (isChecked, client) => {
+const checked = (isChecked, employee) => {
   if (isChecked) {
-    checkedRows.value.push(client)
+    checkedRows.value.push(employee)
   } else {
-    checkedRows.value = remove(checkedRows.value, (row) => row.id === client.id)
+    checkedRows.value = remove(checkedRows.value, (row) => row.id === employee.id)
   }
 }
 
 // Function to handle the delete action
-const deleteClient = async (client) => {
+const deleteEmployee = async (employee) => {
 
-  const deleteClientPayload = {
-    client_id: client['ClientID'],
+  const deleteEmployeePayload = {
+    employee_id: employee['UserID'],
     token: localStorage.getItem('token'),
     user_id: localStorage.getItem('userId'),
-
   }
+
   try {
-    await axios.post(`http://localhost:5000/clients/delete`, deleteClientPayload)
-    // Assuming you refetch the client list after deletion
-    mainStore.fetchClients()
+    await axios.post(`http://localhost:5000/employees/delete`, deleteEmployeePayload)
     isModalDangerActive.value = false
-    router.push('/clients')
+    router.push('/employees')
   } catch (error) {
     alert(`Error: ${error.message}`)
   }
@@ -97,40 +96,36 @@ const deleteClient = async (client) => {
     <p>This is sample modal</p>
   </CardBoxModal>
 
-  <CardBoxModal v-model="isModalDangerActive" title="Please confirm" button="danger" has-cancel>
-    <p>Are you sure you want to permanently delete client <b>User ID: {{ selectedClientId }}</b></p>
+  <CardBoxModalDeleteEmployee v-model="isModalDangerActive" title="Please confirm" button="danger" has-cancel :item="selectedEmployeeId">
+    <p>Are you sure you want to permanently delete employee <b>User ID: {{ selectedEmployeeId }}</b></p>
     <p>This is sample modal</p>
-  </CardBoxModal>
+  </CardBoxModalDeleteEmployee>
 
   <table>
     <thead>
       <tr>
         <th v-if="checkable" />
-        <th>Name</th>
+        <th>Username</th>
         <th>Email</th>
-        <th>Address</th>
-        <th>City</th>
-        <th>Country</th>
+        <th>Comission</th>
+        <th>Status</th>
         <th />
       </tr>
     </thead>
     <tbody>
-      <tr v-for="client in items" :key="client['ClientID']">
-        <TableCheckboxCell v-if="checkable" @checked="checked($event, client)"/>
+      <tr v-for="employee in items" :key="employee['UserID']">
+        <TableCheckboxCell v-if="checkable" @checked="checked($event, employee)"/>
         <td data-label="Name">
-          {{ client['FirstName'] }} {{ client['LastName'] }} 
+          {{ employee['Username'] }}
         </td>
         <td data-label="Email">
-          {{ client['Email'] }}
+          {{ employee['Email'] }}
         </td>
-        <td data-label="Address">
-          {{ client['Address'] }}
+        <td data-label="Commission">
+          {{ employee['CommissionPercentage'] }}%
         </td>
-        <td data-label="City">
-          {{ client['City'] }}
-        </td>
-        <td data-label="Country">
-          {{ client['Country'] }}
+        <td data-label="Status">
+          {{ employee['isActive'] }}
         </td>
         <td class="before:hidden lg:w-1 whitespace-nowrap">
           <BaseButtons type="justify-start lg:justify-end" no-wrap>
@@ -139,7 +134,7 @@ const deleteClient = async (client) => {
               color="danger"
               :icon="mdiTrashCan"
               small
-              @click="() => { selectedClientId = client['ClientID']; isModalDangerActive = true }"
+              @click="() => { selectedEmployeeId = employee['UserID']; isModalDangerActive = true }"
             />
           </BaseButtons>
         </td>

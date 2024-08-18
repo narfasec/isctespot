@@ -96,8 +96,8 @@ if signup_data['status'] == 'Ok':
 else:
     test_output_status('fail', 'Signup failed')
 
-# Admin all employees
-test_output_status('info', 'Testing list clients')
+# Admin list all employees
+test_output_status('info', 'Testing list employees')
 list_employees_url = f'{base_url}/employees'
 list_employees_payload = {
     'user_id': user_id,
@@ -114,7 +114,7 @@ else:
     
 # Admin adds new users
 test_output_status('info', 'Employee creation')
-new_employee_url = f'{base_url}/new-employee'
+new_employee_url = f'{base_url}/employee/new'
 new_employee_payload = {
     'username': 'employeetest',
     'email': 'employeetest@email.com',
@@ -132,7 +132,7 @@ else:
 
 # Delete employee
 test_output_status('info', 'Testing employee deletion')
-delete_employee_url = f'{base_url}/delete-employee'
+delete_employee_url = f'{base_url}/employee/delete'
 delete_employee_payload = {
     'user_id': user_id,
     'employee_id': employee_id,

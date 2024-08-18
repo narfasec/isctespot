@@ -60,6 +60,15 @@ const routes = [
   },
   {
     meta: {
+      title: 'New mployee',
+      requiresAuth: true
+    },
+    path: '/company/employees/new',
+    name: 'new employee',
+    component: () => import('@/views/NewEmployeeView.vue')
+  },
+  {
+    meta: {
       title: 'Cash flow',
       requiresAuth: true
     },

@@ -19,6 +19,7 @@ export const useMainStore = defineStore('main', () => {
   const userOverview = ref([])
   const adminOverview = ref([])
   const _clients = ref([])
+  const _employees = ref([])
 
   function setUser(payload) {
     if (payload.name) {
@@ -99,6 +100,40 @@ export const useMainStore = defineStore('main', () => {
     });
   }
 
+  function getCompanyEmployees() {
+    const url = "http://localhost:5000/employees"
+    const employeesPayload = {
+      user_id: localStorage.getItem('userId'),
+      token: localStorage.getItem('token'),
+      comp_id: localStorage.getItem('companyId')
+    };
+    axios
+      .post(url, employeesPayload)
+      .then((r) => {
+        this._employees = r.data.employees
+      })
+      .catch((error) => {
+        alert(error.message);
+    });
+  }
+
+  function deleteEmployee(employee_id){
+    const url = "http://localhost:5000/employee/delete"
+    const employeesPayload = {
+      user_id: localStorage.getItem('userId'),
+      token: localStorage.getItem('token'),
+      employee_id: employee_id
+    };
+    axios
+      .post(url, employeesPayload)
+      .then((r) => {
+        router.push('/employees')
+      })
+      .catch((error) => {
+        alert(error.message);
+    });
+  }
+
   return {
     userName,
     userEmail,
@@ -108,11 +143,15 @@ export const useMainStore = defineStore('main', () => {
     history,
     userOverview,
     adminOverview,
+    _clients,
+    _employees,
     setUser,
     fetchSampleClients,
     fetchSampleHistory,
     getUserInfo,
     getAdminOverview,
     getClients,
+    getCompanyEmployees,
+    deleteEmployee
   }
 })

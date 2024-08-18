@@ -15,15 +15,10 @@ import CardBoxNewClient from '@/components/CardBoxNewClient.vue'
 const mainStore = useMainStore()
 
 onBeforeMount(() => {
-  mainStore.getClients()
-  // console.log('Clients below')
-  // console.log(mainStore._clients)
-  // mainStore._clients.forEach(client => {
-  //   console.log(client.email);
-  // });
+  mainStore.getCompanyEmployees()
 })
-const newClient = () => {
-  router.push('/clients/new')
+const newEmployee = () => {
+  router.push('/company/employees/new')
 }
 const router = useRouter()
 const isModalActive = ref(false)
@@ -42,7 +37,7 @@ const isModalActive = ref(false)
           color="success"
           rounded-full
           small
-          @click="newClient"
+          @click="newEmployee"
         />
       </SectionTitleLineWithButton>
 

@@ -110,7 +110,7 @@ def signup():
     else:
         return jsonify({'status': 'Bad request'}), 400
 
-@auth.route('/new-employee', methods=['POST'])
+@auth.route('/employee/new', methods=['POST'])
 def new_employee():
     ''' Create new employee function '''
     dbc = DBConnector()
@@ -148,7 +148,7 @@ def retire():
     else:
         return jsonify({'status': 'Bad request'}), 400
 
-@auth.route('/delete-employee', methods=['POST'])
+@auth.route('/employee/delete', methods=['POST'])
 def delete_employee():
     ''' Delete employee function '''
     dbc = DBConnector()

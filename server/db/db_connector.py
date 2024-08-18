@@ -98,7 +98,7 @@ class DBConnector:
                     return result
                 else:
                     return False
-            
+
             elif query == 'get_employees_list':
                 cursor.execute(
                     "SELECT UserID, Username, Email, CommissionPercentage, isActive FROM Users WHERE CompanyID = ?",
