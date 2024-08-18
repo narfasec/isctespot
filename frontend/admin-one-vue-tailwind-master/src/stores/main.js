@@ -18,6 +18,7 @@ export const useMainStore = defineStore('main', () => {
   const history = ref([])
   const userOverview = ref([])
   const adminOverview = ref([])
+  const _clients = ref([])
 
   function setUser(payload) {
     if (payload.name) {
@@ -38,7 +39,7 @@ export const useMainStore = defineStore('main', () => {
         alert(error.message)
       })
   }
-4
+
   function fetchSampleHistory() {
     axios
       .get(`data-sources/history.json`)
@@ -83,6 +84,21 @@ export const useMainStore = defineStore('main', () => {
     });
   }
 
+  function getClients() {
+    const url = "http://localhost:5000/clients"
+    const clientsPayload = {
+      user_id: Number(localStorage.getItem('userId')),
+    };
+    axios
+      .post(url, clientsPayload)
+      .then((r) => {
+        this._clients = r.data.clients
+      })
+      .catch((error) => {
+        alert(error.message);
+    });
+  }
+
   return {
     userName,
     userEmail,
@@ -97,5 +113,6 @@ export const useMainStore = defineStore('main', () => {
     fetchSampleHistory,
     getUserInfo,
     getAdminOverview,
+    getClients,
   }
 })

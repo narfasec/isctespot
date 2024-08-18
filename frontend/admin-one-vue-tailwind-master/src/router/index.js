@@ -15,12 +15,59 @@ const routes = [
     // Document title tag
     // We combine it with defaultDocumentTitle set in `src/main.js` on router.afterEach hook
     meta: {
-      title: 'Dashboard'
+      title: 'Dashboard',
+      requiresAuth: true
     },
     path: '/dashboard',
     name: 'dashboard',
     component: Home
   },
+  {
+    meta: {
+      title: 'Clients',
+      requiresAuth: true
+    },
+    path: '/clients',
+    name: 'clients',
+    component: () => import('@/views/ClientsView.vue')
+  },
+  {
+    meta: {
+      title: 'New Client',
+      requiresAuth: true
+    },
+    path: '/clients/new',
+    name: 'new clients',
+    component: () => import('@/views/NewClientView.vue')
+  },
+  {
+    meta: {
+      title: 'Sales',
+      requiresAuth: true
+    },
+    path: '/sales',
+    name: 'sales',
+    component: () => import('@/views/SalesView.vue')
+  },
+  {
+    meta: {
+      title: 'Employees',
+      requiresAuth: true
+    },
+    path: '/company/employees',
+    name: 'employees',
+    component: () => import('@/views/CompanyEmployeesView.vue')
+  },
+  {
+    meta: {
+      title: 'Cash flow',
+      requiresAuth: true
+    },
+    path: '/company/cash-flow',
+    name: 'cash-flow',
+    component: () => import('@/views/CompanyCashFlowView.vue')
+  },
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
   {
     meta: {
       title: 'Tables'
@@ -94,5 +141,27 @@ const router = createRouter({
     return savedPosition || { top: 0 }
   }
 })
+
+router.beforeEach((to, from, next) => {
+  // Check if the route requires authentication
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    const token = localStorage.getItem('token');
+    
+    // Regex pattern to match the token
+    const regex = /^[A-Z0-9]{6}$/; // Simplified regex without quotes
+
+    // If the token is not valid, redirect to login
+    if (!token || !regex.test(token)) {
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath } // Save the intended route for after login
+      });
+    } else {
+      next(); // Token is valid, allow navigation
+    }
+  } else {
+    next(); // Route does not require authentication
+  }
+});
 
 export default router

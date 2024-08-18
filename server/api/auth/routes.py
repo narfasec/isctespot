@@ -28,7 +28,10 @@ def login():
         else:
             is_admin = 'false'
             token = current_app.config['AUTH_TOKEN']
-        return jsonify({'status': 'Ok', 'user_id': _id, 'token': token, 'is_admin': is_admin}), 200
+        comp_id = dbc.execute_query(query='get_user_comp_id', args=_id)
+        if not isinstance(comp_id, int):
+            return jsonify({'status': 'Bad request'}), 400
+        return jsonify({'status': 'Ok', 'user_id': _id, 'token': token, 'is_admin': is_admin, 'comp_id': comp_id}), 200
     return jsonify({'status': 'Bad credentials'}), 403
 
 @auth.route('/logout', methods=['POST'])
@@ -77,7 +80,8 @@ def signup():
         "password": dict_data['password'],
         "email": dict_data['email'],
         "comp_name": dict_data['comp_name'],
-        "num_employees": dict_data['num_employees']    
+        "num_employees": dict_data['num_employees'],
+        "is_admin": True 
     })
     if isinstance(result,int):
         user_id = result
@@ -121,7 +125,7 @@ def new_employee():
     if isinstance(result, int):
         return jsonify({'status': 'Ok', 'employee_id': result})
     else:
-        return jsonify({'status': 'Bad requests'})
+        return jsonify({'status': 'Bad request'})
 
 @auth.route('/retire', methods=['POST'])
 def retire():

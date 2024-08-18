@@ -10,7 +10,22 @@ import {
   mdiTelevisionGuide,
   mdiResponsive,
   mdiPalette,
-  mdiReact
+  mdiReact,
+  mdiCash100,
+  mdiSalesforce,
+  mdiNaturePeople,
+  mdiGroup,
+  mdiSeatIndividualSuite,
+  mdiTarget,
+  mdiVlc,
+  mdiMustache,
+  mdiMagicStaff,
+  mdiImageFilterCenterFocus,
+  mdiHatFedora,
+  mdiBookAccount,
+  mdiBookPlay,
+  mdiBook,
+  mdiCash
 } from '@mdi/js'
 
 const menuItems = [
@@ -18,6 +33,16 @@ const menuItems = [
     to: '/dashboard',
     icon: mdiMonitor,
     label: 'Dashboard'
+  },
+  {
+    to: '/clients',
+    icon: mdiHatFedora,
+    label: 'Clients'
+  },
+  {
+    to: '/sales',
+    icon: mdiCash,
+    label: 'Sales'
   },
   {
     to: '/tables',
@@ -50,11 +75,6 @@ const menuItems = [
     icon: mdiAccountCircle
   },
   {
-    to: '/login',
-    label: 'Login',
-    icon: mdiLock
-  },
-  {
     to: '/error',
     label: 'Error',
     icon: mdiAlertCircle
@@ -62,17 +82,18 @@ const menuItems = [
 ]
 
 // Check if the user is an admin
-console.log('isAdmin')
 if (localStorage.getItem('isAdmin') === 'true') {
   menuItems.push({
     label: 'Company',
     icon: mdiViewList,
     menu: [
       {
-        label: 'Analytics'
+        to: '/company/employees',
+        label: 'Employees'
       },
       {
-        label: 'Overview'
+        company: 'company/cash-flow',
+        label: 'Cash Flow'
       }
     ]
   })

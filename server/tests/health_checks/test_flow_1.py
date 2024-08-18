@@ -96,6 +96,22 @@ if signup_data['status'] == 'Ok':
 else:
     test_output_status('fail', 'Signup failed')
 
+# Admin all employees
+test_output_status('info', 'Testing list clients')
+list_employees_url = f'{base_url}/employees'
+list_employees_payload = {
+    'user_id': user_id,
+    'token': ADMIN_AUTH_TOKEN,
+    'comp_id': '1'
+}
+list_employees_response = requests.get(list_employees_url, json=list_employees_payload)
+list_employees_data = list_employees_response.json()
+if list_employees_data['status'] == 'Ok':
+    test_output_status('pass', 'List employees  success')
+    print(list_employees_data['employees'])
+else:
+    test_output_status('fail', 'List employees failed')
+    
 # Admin adds new users
 test_output_status('info', 'Employee creation')
 new_employee_url = f'{base_url}/new-employee'

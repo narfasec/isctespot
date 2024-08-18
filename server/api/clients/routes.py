@@ -4,7 +4,7 @@ import json
 
 clients = Blueprint('clients', __name__)
 
-@clients.route('/clients', methods=['GET'])
+@clients.route('/clients', methods=['GET', 'POST'])
 def list_clients():
     ''' List clients function'''
     dbc = DBConnector()

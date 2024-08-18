@@ -32,8 +32,10 @@ class DBConnector:
                         'get_user_password'         args:password       |       return: password id if exits if not, return false
                         'get_user_by_id'            args:user_id        |       return: all parameters
                         'get_user_sales             args:user_id        |       return: list of sales by the user
-                        'get_clients_list           args:company_id     |       return: list of clients
+                        'get_clients_list'          args:company_id     |       return: list of clients
+                        'get_employees_list'        args:company_id     |       return: list of employees
                         'get_user_admin'            args:user_id        |       return: is_admin value (True or False)
+                        'get_user_comp_id'          args:user_id        |       return: comp_id
                     CREATE
                         'create_user_employee'      args: {username, email, company_id}
                         'create_user_admin'         args: {username, password, email}
@@ -96,6 +98,17 @@ class DBConnector:
                     return result
                 else:
                     return False
+            
+            elif query == 'get_employees_list':
+                cursor.execute(
+                    "SELECT UserID, Username, Email, CommissionPercentage, isActive FROM Users WHERE CompanyID = ?",
+                    (args,)
+                )
+                result = cursor.fetchall()
+                if isinstance(result, list):
+                    return result
+                else:
+                    return False
 
             elif query == 'get_compnay_id_by_user':
                 cursor.execute('SELECT CompanyID FROM Companies WHERE AdminUserID = ?', (args,))
@@ -121,6 +134,7 @@ class DBConnector:
                     return result
                 else:
                     return False
+
             elif query == 'get_user_sales':
                 cursor.execute(
                     """
@@ -148,6 +162,20 @@ class DBConnector:
                 else:
                     return result['IsAdmin']
 
+            elif query == 'get_user_comp_id':
+                cursor.execute(
+                    """
+                    SELECT CompanyID FROM Users WHERE UserID = ?;
+                    """,
+                    (args,)
+                )
+                result = cursor.fetchone()
+                print(result)
+                if isinstance(result, tuple):
+                    return result[0]['CompanyID']
+                else:
+                    return result['CompanyID']
+
             elif query == 'create_user_employee':
                 cursor.execute(
                     "INSERT INTO Users (Username, PasswordHash, Email, CompanyID, CommissionPercentage, CreatedAt) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)",
@@ -155,16 +183,15 @@ class DBConnector:
                 )
                 connection.commit()
                 result = cursor.lastrowid
-                print(result)
-                if isinstance(result, int):
+                if isinstance(result, tuple):
                     return result[0]
                 else:
                     return result
 
             elif query == 'create_user_admin':
                 cursor.execute(
-                    "INSERT INTO Users (Username, PasswordHash, Email, CreatedAt) VALUES (?, ?, ?, CURRENT_TIMESTAMP);",
-                    (args['username'], args['password'],args['email'])
+                    "INSERT INTO Users (Username, PasswordHash, Email, IsAdmin, CreatedAt) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP);",
+                    (args['username'], args['password'],args['email'], args['is_admin'])
                 )
                 connection.commit()
                 result = cursor.lastrowid

@@ -1,7 +1,7 @@
 <script setup>
 import { computed, useSlots } from 'vue'
 
-defineProps({
+const props = defineProps({
   label: {
     type: String,
     default: null
@@ -13,6 +13,11 @@ defineProps({
   help: {
     type: String,
     default: null
+  },
+  size: {
+    type: String,
+    default: 'normal', // Default to 'normal' if not specified
+    validator: value => ['small', 'normal'].includes(value) // Only allow 'small' or 'normal'
   }
 })
 
@@ -30,17 +35,24 @@ const wrapperClass = computed(() => {
     base.push('md:grid-cols-2')
   }
 
+  // Adjust classes if size is small
+  if (props.size === 'small') {
+    base.push('text-sm py-1') // Example classes for smaller size
+  }
+
   return base
 })
 </script>
 
 <template>
-  <div class="mb-6 last:mb-0">
-    <label v-if="label" :for="labelFor" class="block font-bold mb-2">{{ label }}</label>
+  <div :class="[props.size === 'small' ? 'mb-3' : 'mb-6', 'last:mb-0']">
+    <label v-if="label" :for="labelFor" :class="size === 'small' ? 'text-sm' : 'block font-bold mb-2'">
+      {{ label }}
+    </label>
     <div :class="wrapperClass">
       <slot />
     </div>
-    <div v-if="help" class="text-xs text-gray-500 dark:text-slate-400 mt-1">
+    <div v-if="help" :class="['text-xs', size === 'small' ? 'mt-0.5' : 'mt-1', 'text-gray-500 dark:text-slate-400']">
       {{ help }}
     </div>
   </div>
