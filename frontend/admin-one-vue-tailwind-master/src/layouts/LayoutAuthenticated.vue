@@ -1,6 +1,6 @@
 <script setup>
 import { mdiForwardburger, mdiBackburger, mdiMenu } from '@mdi/js'
-import { ref } from 'vue'
+import { ref, onBeforeMount } from 'vue'
 import { useRouter } from 'vue-router'
 import menuAside from '@/menuAside.js'
 import menuNavBar from '@/menuNavBar.js'
@@ -12,6 +12,48 @@ import NavBarItemPlain from '@/components/NavBarItemPlain.vue'
 import AsideMenu from '@/components/AsideMenu.vue'
 import FooterBar from '@/components/FooterBar.vue'
 import axios from 'axios'
+import { useMainStore } from '@/stores/main'
+
+
+const mainStore = useMainStore()
+onBeforeMount(async () => {
+  try {
+    const isAdmin = await waitForIsAdmin()
+
+    console.log('isAdmin found:', isAdmin)
+    mainStore.isAdmin = isAdmin
+
+  } catch (error) {
+    console.error(error.message)
+    // Handle the failure case, such as redirecting or showing an error
+  }
+})
+
+function checkIsAdmin() {
+  return localStorage.getItem('isAdmin')
+}
+
+function waitForIsAdmin(retryDelay = 500, maxRetries = 10) {
+  return new Promise((resolve, reject) => {
+    let attempts = 0
+
+    const check = () => {
+      const isAdmin = checkIsAdmin()
+      if (isAdmin) {
+        resolve(isAdmin)
+      } else {
+        attempts++
+        if (attempts < maxRetries) {
+          setTimeout(check, retryDelay)
+        } else {
+          reject(new Error('isAdmin value not found after multiple attempts'))
+        }
+      }
+    }
+
+    check()
+  })
+}
 
 const layoutAsidePadding = 'xl:pl-60'
 

@@ -44,41 +44,41 @@ const menuItems = [
     icon: mdiCash,
     label: 'Sales'
   },
-  {
-    to: '/tables',
-    label: 'Tables',
-    icon: mdiTable
-  },
-  {
-    to: '/forms',
-    label: 'Forms',
-    icon: mdiSquareEditOutline
-  },
-  {
-    to: '/ui',
-    label: 'UI',
-    icon: mdiTelevisionGuide
-  },
-  {
-    to: '/responsive',
-    label: 'Responsive',
-    icon: mdiResponsive
-  },
-  {
-    to: '/',
-    label: 'Styles',
-    icon: mdiPalette
-  },
-  {
-    to: '/profile',
-    label: 'Profile',
-    icon: mdiAccountCircle
-  },
-  {
-    to: '/error',
-    label: 'Error',
-    icon: mdiAlertCircle
-  }
+  // {
+  //   to: '/tables',
+  //   label: 'Tables',
+  //   icon: mdiTable
+  // },
+  // {
+  //   to: '/forms',
+  //   label: 'Forms',
+  //   icon: mdiSquareEditOutline
+  // },
+  // {
+  //   to: '/ui',
+  //   label: 'UI',
+  //   icon: mdiTelevisionGuide
+  // },
+  // {
+  //   to: '/responsive',
+  //   label: 'Responsive',
+  //   icon: mdiResponsive
+  // },
+  // {
+  //   to: '/',
+  //   label: 'Styles',
+  //   icon: mdiPalette
+  // },
+  // {
+  //   to: '/profile',
+  //   label: 'Profile',
+  //   icon: mdiAccountCircle
+  // },
+  // {
+  //   to: '/error',
+  //   label: 'Error',
+  //   icon: mdiAlertCircle
+  // }
 ]
 
 // Check if the user is an admin
@@ -94,25 +94,29 @@ if (localStorage.getItem('isAdmin') === 'true') {
       {
         company: 'company/cash-flow',
         label: 'Cash Flow'
+      },
+      {
+        company: 'company/products',
+        label: 'Products'
       }
     ]
   })
 }
 
 // Add the remaining static menu items
-menuItems.push(
-  {
-    href: 'https://github.com/justboil/admin-one-vue-tailwind',
-    label: 'GitHub',
-    icon: mdiGithub,
-    target: '_blank'
-  },
-  {
-    href: 'https://github.com/justboil/admin-one-react-tailwind',
-    label: 'React version',
-    icon: mdiReact,
-    target: '_blank'
-  }
-)
+// menuItems.push(
+//   {
+//     href: 'https://github.com/justboil/admin-one-vue-tailwind',
+//     label: 'GitHub',
+//     icon: mdiGithub,
+//     target: '_blank'
+//   },
+//   {
+//     href: 'https://github.com/justboil/admin-one-react-tailwind',
+//     label: 'React version',
+//     icon: mdiReact,
+//     target: '_blank'
+//   }
+// )
 
 export default menuItems

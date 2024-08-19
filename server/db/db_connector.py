@@ -41,6 +41,7 @@ class DBConnector:
                         'create_user_admin'         args: {username, password, email}
                         'create_company'            args: {company_name, n_employees}
                         'create_client'             args: {first_name, last_name, email, phone_number, address, city, country, company_id}
+                        'create_sale'               args: {client_id, user_id, product, price, quantity}
                     UPDATE
                         'update_user_password'      args: {user_id, new_password}
                         'update_user_comp_id'       args: {user_id, comp_id}
@@ -219,6 +220,19 @@ class DBConnector:
                 )
                 connection.commit()
                 result = cursor.lastrowid
+                if isinstance(result, tuple):
+                    return result[0]
+                else:
+                    return result
+            
+            elif query == 'create_sale':
+                cursor.execute(
+                    "INSERT INTO Sales (UserID, ClientID, ProductName, Quantity, Price, SaleDate) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)",
+                    (args['user_id'], args['client_id'], args['product'], args['quantity'], args['price'])
+                )
+                connection.commit()
+                result = cursor.lastrowid
+                print(result)
                 if isinstance(result, tuple):
                     return result[0]
                 else:

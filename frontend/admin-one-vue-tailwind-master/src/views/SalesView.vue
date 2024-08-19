@@ -1,45 +1,52 @@
 <script setup>
-import { mdiMonitorCellphone, mdiTableBorder, mdiTableOff, mdiGithub } from '@mdi/js'
+import { onBeforeMount, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { mdiMonitorCellphone, mdiTableBorder, mdiTableOff, mdiGithub, mdiPlus } from '@mdi/js'
+import { useMainStore } from '@/stores/main'
 import SectionMain from '@/components/SectionMain.vue'
 import NotificationBar from '@/components/NotificationBar.vue'
-import TableSampleClients from '@/components/TableSampleClients.vue'
+import TableSales from '@/components/TableSales.vue'
 import CardBox from '@/components/CardBox.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import BaseButton from '@/components/BaseButton.vue'
-import CardBoxComponentEmpty from '@/components/CardBoxComponentEmpty.vue'
+import CardBoxNewClient from '@/components/CardBoxNewClient.vue'
+
+const mainStore = useMainStore()
+
+onBeforeMount(() => {
+  if(localStorage.getItem('isAdmin') == 'true'){
+    mainStore.getAdminOverview()
+  }else{
+    mainStore.getUserInfo()
+  }
+})
+const newSale = () => {
+  router.push('/sales/new')
+}
+const router = useRouter()
+const isModalActive = ref(false)
+
 </script>
 
 <template>
   <LayoutAuthenticated>
+    
     <SectionMain>
-      <SectionTitleLineWithButton :icon="mdiTableBorder" title="Tables" main>
+      <SectionTitleLineWithButton :icon="mdiTableBorder" title="Sales" main>
         <BaseButton
-          href="https://github.com/justboil/admin-one-vue-tailwind"
           target="_blank"
-          :icon="mdiGithub"
-          label="Star on GitHub"
-          color="contrast"
+          :icon="mdiPlus"
+          label="New sale"
+          color="success"
           rounded-full
           small
+          @click="newSale"
         />
       </SectionTitleLineWithButton>
-      <NotificationBar color="info" :icon="mdiMonitorCellphone">
-        <b>Responsive table.</b> Collapses on mobile
-      </NotificationBar>
 
       <CardBox class="mb-6" has-table>
-        <TableSampleClients checkable />
-      </CardBox>
-
-      <SectionTitleLineWithButton :icon="mdiTableOff" title="Empty variation" />
-
-      <NotificationBar color="danger" :icon="mdiTableOff">
-        <b>Empty table.</b> When there's nothing to show
-      </NotificationBar>
-
-      <CardBox>
-        <CardBoxComponentEmpty />
+        <TableSales />
       </CardBox>
     </SectionMain>
   </LayoutAuthenticated>

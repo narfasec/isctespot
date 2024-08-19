@@ -33,6 +33,7 @@ const submit = () => {
       localStorage.setItem('userId', response.data.user_id)
       localStorage.setItem('isAdmin', response.data.is_admin)
       localStorage.setItem('companyId', response.data.comp_id)
+      localStorage.setItem('username', form.login)
       router.push('/dashboard')
     })
     .catch((error) => {

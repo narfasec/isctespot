@@ -130,6 +130,28 @@ if new_employee_data['status'] == 'Ok':
 else:
     test_output_status('fail', 'Employee creation failed')
 
+# Employee User creates new sale
+test_output_status('info', 'Testing Sale creation')
+new_sale_url = f'{base_url}/sales/new'
+new_sale_payload = {
+    'user_id': 7,
+    'client_id': 1,
+    'product': '4K Monitor',
+    'token': AUTH_TOKEN,
+    'quantity': 2,
+    'price': 900,
+}
+
+new_sale_response = requests.post(new_sale_url, json=new_sale_payload)
+new_sale_data = new_sale_response.json()
+sale_id = 0
+if new_sale_data['status'] == 'Ok':
+    sale_id = new_sale_data['sale_id']
+    test_output_status('pass', 'Sale creation success')
+else:
+    test_output_status('fail', 'Sale creation failed')
+
+
 # Delete employee
 test_output_status('info', 'Testing employee deletion')
 delete_employee_url = f'{base_url}/employee/delete'

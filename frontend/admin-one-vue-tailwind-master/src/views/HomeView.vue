@@ -39,6 +39,8 @@ const mainStore = useMainStore()
 // Fetch sample data
 mainStore.fetchSampleClients()
 mainStore.fetchSampleHistory()
+mainStore.getClients()
+mainStore.calculateSalesRevenue()
 
 if (localStorage.isAdmin == 'true')
   mainStore.getAdminOverview()
@@ -46,6 +48,10 @@ else
   mainStore.getUserInfo()
 const clientBarItems = computed(() => mainStore.clients.slice(0, 4))
 const transactionBarItems = computed(() => mainStore.history)
+const numberOfClients = computed(() => mainStore._clients.length)
+const numberOfSales = computed(() => mainStore.sales.length)
+const totalRevenue = computed(() => mainStore.totalRevenue)
+
 </script>
 
 <template>
@@ -69,7 +75,7 @@ const transactionBarItems = computed(() => mainStore.history)
           trend-type="up"
           color="text-emerald-500"
           :icon="mdiAccountMultiple"
-          :number="512"
+          :number="numberOfClients"
           label="Clients"
         />
         <CardBoxWidget
@@ -77,8 +83,7 @@ const transactionBarItems = computed(() => mainStore.history)
           trend-type="down"
           color="text-blue-500"
           :icon="mdiCartOutline"
-          :number="7770"
-          prefix="$"
+          :number="numberOfSales"
           label="Sales"
         />
         <CardBoxWidget
@@ -86,8 +91,8 @@ const transactionBarItems = computed(() => mainStore.history)
           trend-type="alert"
           color="text-red-500"
           :icon="mdiChartTimelineVariant"
-          :number="256"
-          suffix="%"
+          :number="totalRevenue"
+          prefix="$"
           label="Performance"
         />
       </div>

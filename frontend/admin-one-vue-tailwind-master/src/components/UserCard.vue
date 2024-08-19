@@ -1,7 +1,7 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted} from 'vue'
 import { useMainStore } from '@/stores/main'
-import { mdiCheckDecagram } from '@mdi/js'
+import { mdiAccountCheck, mdiCheckDecagram } from '@mdi/js'
 import BaseLevel from '@/components/BaseLevel.vue'
 import UserAvatarCurrentUser from '@/components/UserAvatarCurrentUser.vue'
 import CardBox from '@/components/CardBox.vue'
@@ -13,6 +13,12 @@ const mainStore = useMainStore()
 const userName = computed(() => mainStore.userName)
 
 const userSwitchVal = ref(false)
+
+const isAdmin = ref(false)
+
+onMounted(() => {
+  isAdmin.value = localStorage.getItem('isAdmin') === 'true'
+})
 </script>
 
 <template>
@@ -34,8 +40,8 @@ const userSwitchVal = ref(false)
           >!
         </h1>
         <p>Last login <b>12 mins ago</b> from <b>127.0.0.1</b></p>
-        <div class="flex justify-center md:block">
-          <PillTag label="Verified" color="info" :icon="mdiCheckDecagram" />
+        <div v-if="isAdmin" class="flex justify-center md:block">
+          <PillTag label="Admin" color="info" :icon="mdiAccountCheck" />
         </div>
       </div>
     </BaseLevel>

@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import axios from 'axios'
 
 export const useMainStore = defineStore('main', () => {
-  const userName = ref('John Doe')
+  const userName = ref(localStorage.getItem('username'))
   const userEmail = ref('doe.doe.doe@example.com')
   const userAvatar = computed(
     () =>
@@ -16,10 +16,11 @@ export const useMainStore = defineStore('main', () => {
   const isFieldFocusRegistered = ref(false)
   const clients = ref([])
   const history = ref([])
-  const userOverview = ref([])
-  const adminOverview = ref([])
+  const sales = ref([])
   const _clients = ref([])
   const _employees = ref([])
+  const totalRevenue = ref([])
+  // const userName = ref()
 
   function setUser(payload) {
     if (payload.name) {
@@ -61,7 +62,7 @@ export const useMainStore = defineStore('main', () => {
     axios
       .post(url, userOverviewPayload)
       .then((r) => {
-        this.userOverview = r.data
+        this.sales = r.data.sales
       })
       .catch((error) => {
         alert(error.message);
@@ -78,7 +79,7 @@ export const useMainStore = defineStore('main', () => {
     axios
       .post(url, adminOverviewPayload)
       .then((r) => {
-        this.adminOverview = r.data
+        this.sales = r.data.sales
       })
       .catch((error) => {
         alert(error.message);
@@ -134,6 +135,18 @@ export const useMainStore = defineStore('main', () => {
     });
   }
 
+  function calculateSalesRevenue() {
+    let totalRevenue = 0;
+  
+    // Iterate through each sale and calculate revenue
+    this.sales.forEach((sale) => {
+      const revenue = sale.Price * sale.Quantity;
+      totalRevenue += revenue;
+    });
+  
+    this.totalRevenue = totalRevenue;
+  }
+
   return {
     userName,
     userEmail,
@@ -141,10 +154,10 @@ export const useMainStore = defineStore('main', () => {
     isFieldFocusRegistered,
     clients,
     history,
-    userOverview,
-    adminOverview,
+    sales,
     _clients,
     _employees,
+    totalRevenue,
     setUser,
     fetchSampleClients,
     fetchSampleHistory,
@@ -152,6 +165,7 @@ export const useMainStore = defineStore('main', () => {
     getAdminOverview,
     getClients,
     getCompanyEmployees,
-    deleteEmployee
+    deleteEmployee,
+    calculateSalesRevenue
   }
 })
