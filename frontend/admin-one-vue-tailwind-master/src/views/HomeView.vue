@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, onBeforeMount } from 'vue'
 import { useMainStore } from '@/stores/main'
 import {
   mdiAccountMultiple,
@@ -36,16 +36,17 @@ onMounted(() => {
 
 const mainStore = useMainStore()
 
-// Fetch sample data
-mainStore.fetchSampleClients()
-mainStore.fetchSampleHistory()
-mainStore.getClients()
-mainStore.calculateSalesRevenue()
+onBeforeMount(() => {
+  mainStore.fetchSampleClients()
+  mainStore.fetchSampleHistory()
+  mainStore.getClients()
+  if (localStorage.isAdmin == 'true')
+    mainStore.getAdminOverview()
+  else
+    mainStore.getUserInfo()
+  mainStore.calculateSalesRevenue()
+})
 
-if (localStorage.isAdmin == 'true')
-  mainStore.getAdminOverview()
-else
-  mainStore.getUserInfo()
 const clientBarItems = computed(() => mainStore.clients.slice(0, 4))
 const transactionBarItems = computed(() => mainStore.history)
 const numberOfClients = computed(() => mainStore._clients.length)
@@ -58,15 +59,7 @@ const totalRevenue = computed(() => mainStore.totalRevenue)
   <LayoutAuthenticated>
     <SectionMain>
       <SectionTitleLineWithButton :icon="mdiChartTimelineVariant" title="Overview" main>
-        <BaseButton
-          href="https://github.com/justboil/admin-one-vue-tailwind"
-          target="_blank"
-          :icon="mdiGithub"
-          label="Star on GitHub"
-          color="contrast"
-          rounded-full
-          small
-        />
+
       </SectionTitleLineWithButton>
 
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
@@ -97,6 +90,15 @@ const totalRevenue = computed(() => mainStore.totalRevenue)
         />
       </div>
 
+      <SectionTitleLineWithButton :icon="mdiChartPie" title="Trends overview">
+        <BaseButton :icon="mdiReload" color="whiteDark" @click="fillChartData" />
+      </SectionTitleLineWithButton>
+      <CardBox class="mb-6">
+        <div v-if="chartData">
+          <line-chart :data="chartData" class="h-96" />
+        </div>
+      </CardBox>
+
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div class="flex flex-col justify-between">
           <CardBoxTransaction
@@ -121,28 +123,6 @@ const totalRevenue = computed(() => mainStore.totalRevenue)
           />
         </div>
       </div>
-
-      <SectionBannerStarOnGitHub class="mt-6 mb-6" />
-
-      <SectionTitleLineWithButton :icon="mdiChartPie" title="Trends overview">
-        <BaseButton :icon="mdiReload" color="whiteDark" @click="fillChartData" />
-      </SectionTitleLineWithButton>
-
-      <CardBox class="mb-6">
-        <div v-if="chartData">
-          <line-chart :data="chartData" class="h-96" />
-        </div>
-      </CardBox>
-
-      <SectionTitleLineWithButton :icon="mdiAccountMultiple" title="Clients" />
-
-      <NotificationBar color="info" :icon="mdiMonitorCellphone">
-        <b>Responsive table.</b> Collapses on mobile
-      </NotificationBar>
-
-      <CardBox has-table>
-        <TableSampleClients />
-      </CardBox>
     </SectionMain>
   </LayoutAuthenticated>
 </template>

@@ -13,6 +13,7 @@ import BaseButtons from '@/components/BaseButtons.vue'
 import UserCard from '@/components/UserCard.vue'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
+import axios from 'axios'
 
 const mainStore = useMainStore()
 
@@ -27,12 +28,27 @@ const passwordForm = reactive({
   password_confirmation: ''
 })
 
-const submitProfile = () => {
-  mainStore.setUser(profileForm)
-}
-
 const submitPass = () => {
-  //
+  if(passwordForm.password != passwordForm.password_confirmation){
+    alert("Passwords don't match")
+    return;
+  }
+
+  const resetPassPayload = {
+    current_password: passwordForm.password_current,
+    new_password: passwordForm.password,
+    token: localStorage.getItem('token'),
+    user_id: localStorage.getItem('userId')
+  }
+
+  axios
+    .post('http://localhost:5000/user/reset-password', resetPassPayload)
+    .then(() => {
+      alert('Password updated!');
+    })
+    .catch((error) => {
+      alert(error.message);
+  });
 }
 </script>
 
@@ -40,21 +56,12 @@ const submitPass = () => {
   <LayoutAuthenticated>
     <SectionMain>
       <SectionTitleLineWithButton :icon="mdiAccount" title="Profile" main>
-        <BaseButton
-          href="https://github.com/justboil/admin-one-vue-tailwind"
-          target="_blank"
-          :icon="mdiGithub"
-          label="Star on GitHub"
-          color="contrast"
-          rounded-full
-          small
-        />
       </SectionTitleLineWithButton>
 
       <UserCard class="mb-6" />
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <CardBox is-form @submit.prevent="submitProfile">
+        <!-- <CardBox is-form @submit.prevent="submitProfile">
           <FormField label="Avatar" help="Max 500kb">
             <FormFilePicker label="Upload" />
           </FormField>
@@ -85,7 +92,7 @@ const submitPass = () => {
               <BaseButton color="info" label="Options" outline />
             </BaseButtons>
           </template>
-        </CardBox>
+        </CardBox> -->
 
         <CardBox is-form @submit.prevent="submitPass">
           <FormField label="Current password" help="Required. Your current password">
@@ -126,7 +133,6 @@ const submitPass = () => {
           <template #footer>
             <BaseButtons>
               <BaseButton type="submit" color="info" label="Submit" />
-              <BaseButton color="info" label="Options" outline />
             </BaseButtons>
           </template>
         </CardBox>
