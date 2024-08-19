@@ -1,7 +1,0 @@
-rules:
-  - id: my-rule
-    paths:
-      exclude:
-        - frontend/admin-one-vue-tailwind-master/node_modules/
-        - server/venv/
-        - server/tests/

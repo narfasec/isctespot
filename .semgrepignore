@@ -1,0 +1,27 @@
+# coupling: if you modify this file, please also update OSS/src/targeting/Semgrepignore.ml
+
+# Common large paths
+frontrnd/admin-one-vue-tailwind-master/node_modules/
+build/
+dist/
+vendor/
+server/tests/
+server/venv/
+.env/
+.venv/
+.tox/
+*.min.js
+.npm/
+.yarn/
+
+# Common test paths
+test/
+tests/
+testsuite/
+*_test.go
+
+# Semgrep rules folder
+.semgrep
+
+# Semgrep-action log folder
+.semgrep_logs/
