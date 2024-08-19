@@ -44,16 +44,6 @@ const isModalActive = ref(false)
       <CardBox class="mb-6" has-table>
         <TableEmployees/>
       </CardBox>
-
-      <SectionTitleLineWithButton :icon="mdiTableOff" title="Empty variation" />
-
-      <NotificationBar color="danger" :icon="mdiTableOff">
-        <b>Empty table.</b> When there's nothing to show
-      </NotificationBar>
-
-      <CardBox>
-        <CardBoxComponentEmpty />
-      </CardBox>
     </SectionMain>
   </LayoutAuthenticated>
 </template>
