@@ -22,7 +22,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Build and start services using Docker Compose
-        run: ls-l;docker-compose up -d --build
+        run: ls -l;docker-compose up -d --build
 
       - name: Wait for services to be ready
         run: sleep 10  # Adjust sleep time based on your services’ startup time
