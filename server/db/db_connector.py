@@ -3,13 +3,14 @@ import sys
 class DBConnector:
 
     def __init__(self ):
-        self.host = 'localhost'
+        self.host = 'mariadb'
         self.user = 'root'
         self.password = 'teste123'
         self.database = 'iscte_spot'
         self.port = 3306
 
     def connect(self):
+        print("Trying connection to DB")
         try:
             connection = mariadb.connect(
                 user=self.user,
