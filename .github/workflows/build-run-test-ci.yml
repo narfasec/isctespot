@@ -1,0 +1,63 @@
+name: Docker Compose CI/CD Pipeline
+
+# Trigger the workflow on push or pull request to the main branch
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # Job 1: Build and Run Docker Containers
+  build-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build and start services using Docker Compose
+        run: docker-compose up -d --build
+
+      - name: Wait for services to be ready
+        run: sleep 10  # Adjust sleep time based on your services’ startup time
+
+  # Job 2: Run Database Setup Scripts (Schema + Fake Data)
+  db-setup:
+    runs-on: ubuntu-latest
+    needs: build-and-run
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run database setup script (schema.sql)
+        run: |
+          docker exec project-server-1 python /app/server/db/setup/create_db.py
+
+      - name: Run data population script (data_population.py)
+        run: |
+          docker exec project-server-1 python /app/server/db/setup/data_population.py
+
+  # Job 3: Health Checks and Tests
+  health-check-and-tests:
+    runs-on: ubuntu-latest
+    needs: db-setup
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run health check on frontend
+        run: |
+          # Add your health check commands here
+          curl -f http://localhost:5173/admin-one-vue-tailwind/#/ || exit 1  # Adjust based on your app
+
+      - name: Run health check on backend
+        run: |
+          docker exec project-server-1 python /app/server/tests/health_checks/test_flow_1.py

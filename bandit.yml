@@ -1,2 +1,0 @@
-# FILE: bandit.yaml
-exclude_dirs: ['server/tests', 'server/venv']
