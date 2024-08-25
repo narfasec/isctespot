@@ -1,10 +1,11 @@
 import mariadb
 
 connection = mariadb.connect(
-	host="mariadb",
+	host="0.0.0.0",
 	user="root",
 	password="teste123",
 )
+
 cursor = connection.cursor()
 try:
 
@@ -89,6 +90,19 @@ try:
     COLLATE='latin1_swedish_ci'
     ENGINE=InnoDB
     AUTO_INCREMENT=30;
+    
+    CREATE TABLE IF NOT EXISTS Products (
+		ProductID INT(11) NOT NULL AUTO_INCREMENT,
+		CompanyID INT(11) NOT NULL,
+		ProductName VARCHAR(255) NOT NULL COLLATE 'latin1_swedish_ci',
+		CreatedAt TIMESTAMP NULL DEFAULT current_timestamp(),
+		PRIMARY KEY (ProductID) USING BTREE,
+		INDEX CompanyID (CompanyID) USING BTREE,
+		CONSTRAINT products_ibfk_1 FOREIGN KEY (CompanyID) REFERENCES companies (CompanyID) ON UPDATE RESTRICT ON DELETE RESTRICT
+	)
+	COLLATE='latin1_swedish_ci'
+	ENGINE=InnoDB;
+
     """
 
     # Executing the SQL statements

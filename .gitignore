@@ -8,6 +8,8 @@
 
 # And not this file
 !docker-compose.yml
+!setup.ps1
+!setup.sh
 
 # Ignore any files within the tracked directories
 !.github/**
