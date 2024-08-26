@@ -2,6 +2,7 @@
 $containerName = "project-server-1"
 
 # Define the paths to your scripts inside the container
+$cleanDbScript = "/app/db/setup/clean_db.py"
 $createDbScript = "/app/db/setup/create_db.py"
 $dataPopulationScript = "/app/db/setup/data_population.py"
 
@@ -13,6 +14,12 @@ if (-not $container) {
 }
 
 # Execute the database setup scripts in the correct order
+docker exec $containerName python $cleanDbScript
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "Error executing clean_db.py. Exiting..."
+    exit 1
+}
+
 docker exec $containerName python $createDbScript
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Error executing create_db.py. Exiting..."

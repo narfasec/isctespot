@@ -1,9 +1,10 @@
 import mariadb
 
 connection = mariadb.connect(
-	host="0.0.0.0",
+	host="mariadb",
 	user="root",
 	password="teste123",
+	port=3306
 )
 
 cursor = connection.cursor()
@@ -38,7 +39,7 @@ try:
     )
     COLLATE='latin1_swedish_ci'
     ENGINE=InnoDB
-    AUTO_INCREMENT=244;
+    AUTO_INCREMENT=1;
 
     CREATE TABLE IF NOT EXISTS companies (
         CompanyID INT(11) NOT NULL AUTO_INCREMENT,
@@ -53,7 +54,7 @@ try:
     )
     COLLATE='latin1_swedish_ci'
     ENGINE=InnoDB
-    AUTO_INCREMENT=112;
+    AUTO_INCREMENT=1;
 
     CREATE TABLE IF NOT EXISTS clients (
         ClientID INT(11) NOT NULL AUTO_INCREMENT,
@@ -71,7 +72,7 @@ try:
     )
     COLLATE='latin1_swedish_ci'
     ENGINE=InnoDB
-    AUTO_INCREMENT=50;
+    AUTO_INCREMENT=1;
 
     CREATE TABLE IF NOT EXISTS sales (
         SaleID INT(11) NOT NULL AUTO_INCREMENT,
@@ -89,7 +90,7 @@ try:
     )
     COLLATE='latin1_swedish_ci'
     ENGINE=InnoDB
-    AUTO_INCREMENT=30;
+    AUTO_INCREMENT=1;
     
     CREATE TABLE IF NOT EXISTS Products (
 		ProductID INT(11) NOT NULL AUTO_INCREMENT,
@@ -101,7 +102,9 @@ try:
 		CONSTRAINT products_ibfk_1 FOREIGN KEY (CompanyID) REFERENCES companies (CompanyID) ON UPDATE RESTRICT ON DELETE RESTRICT
 	)
 	COLLATE='latin1_swedish_ci'
-	ENGINE=InnoDB;
+	ENGINE=InnoDB
+ 	AUTO_INCREMENT=1;
+ 
 
     """
 
@@ -119,4 +122,3 @@ finally:
     if connection is not None:
         cursor.close()
         connection.close()
-        print("MySQL connection is closed.")

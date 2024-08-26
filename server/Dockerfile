@@ -22,9 +22,9 @@ RUN pip install -r requirements.txt
 
 # Copy the current directory contents into the container
 COPY . .
-# RUN python /app/db/setup/test_connection.py
-RUN python /app/db/setup/create_db.py
-RUN python /app/db/setup/data_population.py
+# # RUN python /app/db/setup/test_connection.py
+# RUN python /app/db/setup/create_db.py
+# RUN python /app/db/setup/data_population.py
 
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
