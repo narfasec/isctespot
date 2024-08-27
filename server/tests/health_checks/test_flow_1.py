@@ -1,5 +1,4 @@
 import requests
-import json
 import sys
 
 base_url = 'http://127.0.0.1:5000'
@@ -19,7 +18,7 @@ def test_output_status(status, text):
 # User login
 test_output_status('info', 'Testing User authentication')
 login_url = f'{base_url}/login'
-login_payload = {'username': 'testuser', 'password': 'testpassword'}
+login_payload = {'username': 'jdoe', 'password': 'password123'}
 login_response = requests.post(login_url, json=login_payload)
 login_data = login_response.json()
 user_id = 0
@@ -33,10 +32,11 @@ else:
 reset_password_url = f'{base_url}/user/reset-password'
 reset_password_payload = {
     'user_id': user_id,
-    'current_password': 'testpassword',
+    'current_password': 'password123',
     'new_password': '1234',
     'token': AUTH_TOKEN
 }
+
 reset_password_response = requests.post(reset_password_url, json=reset_password_payload)
 reset_password_data = reset_password_response.json()
 if reset_password_data['status'] == 'Ok':
@@ -102,8 +102,9 @@ list_employees_url = f'{base_url}/employees'
 list_employees_payload = {
     'user_id': user_id,
     'token': ADMIN_AUTH_TOKEN,
-    'comp_id': '1'
+    'comp_id': comp_id
 }
+
 list_employees_response = requests.get(list_employees_url, json=list_employees_payload)
 list_employees_data = list_employees_response.json()
 if list_employees_data['status'] == 'Ok':
@@ -111,7 +112,7 @@ if list_employees_data['status'] == 'Ok':
     print(list_employees_data['employees'])
 else:
     test_output_status('fail', 'List employees failed')
-    
+
 # Admin adds new users
 test_output_status('info', 'Employee creation')
 new_employee_url = f'{base_url}/employee/new'
@@ -134,7 +135,7 @@ else:
 test_output_status('info', 'Testing Sale creation')
 new_sale_url = f'{base_url}/sales/new'
 new_sale_payload = {
-    'user_id': 7,
+    'user_id': employee_id,
     'client_id': 1,
     'product': '4K Monitor',
     'token': AUTH_TOKEN,
@@ -156,7 +157,7 @@ else:
 test_output_status('info', 'Testing employee deletion')
 delete_employee_url = f'{base_url}/employee/delete'
 delete_employee_payload = {
-    'user_id': user_id,
+    'user_id': 1,
     'employee_id': employee_id,
     'token': ADMIN_AUTH_TOKEN,
 }
@@ -187,7 +188,7 @@ test_output_status('info', 'Testing new client')
 new_client_url = f'{base_url}/clients/new'
 new_client_payload = {
     'user_id': 1,
-    'comp_id': 3,
+    'comp_id': 1,
     'first_name': 'Roger',
     'last_name': 'Schmidt',
     'email': 'roger.schmidt@benfica.pt',
@@ -232,7 +233,7 @@ else:
 test_output_status('info', 'Testing analytics')
 analytics_url = f'{base_url}/analytics'
 analytics_payload = {
-    'user_id': 3,
+    'user_id': 1,
     'token': ADMIN_AUTH_TOKEN,
     'company_id': 1
 }

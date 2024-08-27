@@ -76,7 +76,7 @@ try:
 
     CREATE TABLE IF NOT EXISTS sales (
         SaleID INT(11) NOT NULL AUTO_INCREMENT,
-        UserID INT(11) NOT NULL,
+        UserID INT(11) NULL,
         ClientID INT(11) NOT NULL,
         ProductName VARCHAR(100) NOT NULL COLLATE 'latin1_swedish_ci',
         Quantity INT(11) NOT NULL,
@@ -85,7 +85,7 @@ try:
         PRIMARY KEY (SaleID) USING BTREE,
         INDEX UserID (UserID) USING BTREE,
         INDEX ClientID (ClientID) USING BTREE,
-        CONSTRAINT sales_ibfk_1 FOREIGN KEY (UserID) REFERENCES users (UserID) ON UPDATE RESTRICT ON DELETE RESTRICT,
+        CONSTRAINT sales_ibfk_1 FOREIGN KEY (UserID) REFERENCES users (UserID) ON UPDATE RESTRICT ON DELETE SET NULL,
         CONSTRAINT sales_ibfk_2 FOREIGN KEY (ClientID) REFERENCES clients (ClientID) ON UPDATE RESTRICT ON DELETE RESTRICT
     )
     COLLATE='latin1_swedish_ci'
