@@ -3,7 +3,7 @@ import sys
 class DBConnector:
 
     def __init__(self ):
-        self.host = 'mariadb'
+        self.host = 'localhost'
         self.user = 'root'
         self.password = 'teste123'
         self.database = 'iscte_spot'
@@ -61,7 +61,7 @@ class DBConnector:
         result = None
         try:
             if query == 'get_user_by_name':
-                cursor.execute("SELECT UserID FROM Users WHERE Username = ?", (args,))
+                cursor.execute(f"SELECT UserID FROM Users WHERE Username = {args}")
                 result = cursor.fetchone()
                 try:
                     if isinstance(result, tuple):
@@ -76,7 +76,7 @@ class DBConnector:
                     return 'TypeError'
 
             elif query == 'get_user_password':
-                cursor.execute("SELECT PasswordHash FROM Users WHERE PasswordHash = ?", (args,))
+                cursor.execute(f"SELECT PasswordHash FROM Users WHERE PasswordHash = {args}")
                 result = cursor.fetchone()
                 try:
                     if isinstance(result, tuple):
@@ -87,14 +87,16 @@ class DBConnector:
                     return False
 
             elif query == 'get_user_by_id':
-                cursor.execute("SELECT * FROM Users WHERE UserID = ?", (args,))
+                cursor.execute(f"SELECT * FROM Users WHERE UserID = {args}")
                 result = cursor.fetchone()
 
             elif query == 'get_clients_list':
                 cursor.execute(
-                    "SELECT ClientID, FirstName, LastName, Email, PhoneNumber, Address, City, Country FROM Clients WHERE CompanyID = ?",
-                    (args,)
-                )
+                    f"""
+                    SELECT ClientID, FirstName, LastName, Email, PhoneNumber, Address, City, Country
+                    FROM Clients
+                    WHERE CompanyID = {args}
+                    """)
                 result = cursor.fetchall()
                 if isinstance(result, list):
                     return result
@@ -102,10 +104,7 @@ class DBConnector:
                     return False
 
             elif query == 'get_employees_list':
-                cursor.execute(
-                    "SELECT UserID, Username, Email, CommissionPercentage, isActive FROM Users WHERE CompanyID = ?",
-                    (args,)
-                )
+                cursor.execute(f"SELECT UserID, Username, Email, CommissionPercentage, isActive FROM Users WHERE CompanyID = {args}")
                 result = cursor.fetchall()
                 if isinstance(result, list):
                     return result
@@ -113,7 +112,7 @@ class DBConnector:
                     return False
 
             elif query == 'get_compnay_id_by_user':
-                cursor.execute('SELECT CompanyID FROM Companies WHERE AdminUserID = ?', (args,))
+                cursor.execute(f'SELECT CompanyID FROM Users WHERE UserID = {args}')
                 result = cursor.fetchone()
                 print(result)
                 if isinstance(result, tuple):
@@ -123,13 +122,12 @@ class DBConnector:
 
             elif query == 'get_company_sales':
                 cursor.execute(
-                    """
+                    f"""
                     SELECT Sales.SaleID, Sales.UserID, Sales.ClientID, Sales.ProductName, Sales.Quantity, Sales.Price, Sales.SaleDate
                     FROM Sales
                     JOIN Clients ON Sales.ClientID = Clients.ClientID
-                    WHERE Clients.CompanyID = ?;
-                    """,
-                    (args,)
+                    WHERE Clients.CompanyID = {args};
+                    """
                 )
                 result = cursor.fetchall()
                 if isinstance(result, list):
@@ -139,12 +137,12 @@ class DBConnector:
 
             elif query == 'get_user_sales':
                 cursor.execute(
+                    f"""
+                    SELECT * FROM Sales WHERE UserID = {args};
                     """
-                    SELECT * FROM Sales WHERE UserID = ?;
-                    """,
-                    (args,)
                 )
                 result = cursor.fetchall()
+                print(result)
                 if isinstance(result, list):
                     return result
                 else:
@@ -152,10 +150,9 @@ class DBConnector:
 
             elif query == 'get_user_admin':
                 cursor.execute(
+                    f"""
+                    SELECT IsAdmin FROM Users WHERE UserID = {args};
                     """
-                    SELECT IsAdmin FROM Users WHERE UserID = ?;
-                    """,
-                    (args,)
                 )
                 result = cursor.fetchone()
                 print(result)
@@ -166,10 +163,9 @@ class DBConnector:
 
             elif query == 'get_user_comp_id':
                 cursor.execute(
+                    f"""
+                    SELECT CompanyID FROM Users WHERE UserID = {args};
                     """
-                    SELECT CompanyID FROM Users WHERE UserID = ?;
-                    """,
-                    (args,)
                 )
                 result = cursor.fetchone()
                 print(result)
@@ -179,9 +175,12 @@ class DBConnector:
                     return result['CompanyID']
 
             elif query == 'create_user_employee':
+                
                 cursor.execute(
-                    "INSERT INTO Users (Username, PasswordHash, Email, CompanyID, CommissionPercentage, CreatedAt) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)",
-                    (args['username'], 'T3MP-password-32',args['email'], args['comp_id'], 5)
+                    f"""
+                    INSERT INTO Users (Username, PasswordHash, Email, CompanyID, CommissionPercentage, CreatedAt)
+                    VALUES ({args['username']}, 'T3MP-password-32', {args['email']}, {args['comp_id']}, 5, CURRENT_TIMESTAMP)
+                    """
                 )
                 connection.commit()
                 result = cursor.lastrowid
@@ -192,8 +191,9 @@ class DBConnector:
 
             elif query == 'create_user_admin':
                 cursor.execute(
-                    "INSERT INTO Users (Username, PasswordHash, Email, IsAdmin, CreatedAt) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP);",
-                    (args['username'], args['password'],args['email'], args['is_admin'])
+                    f"""INSERT INTO Users (Username, PasswordHash, Email, IsAdmin, CreatedAt) 
+                    VALUES ({args['username']}, {args['password']}, {args['email']}, {args['is_admin']}, CURRENT_TIMESTAMP);
+                    """
                 )
                 connection.commit()
                 result = cursor.lastrowid
@@ -204,8 +204,10 @@ class DBConnector:
 
             elif query == 'create_company':
                 cursor.execute(
-                    "INSERT INTO Companies (CompanyName, NumberOfEmployees, AdminUserID, Revenue) VALUES (?, ?, ?, ?)",
-                    (args['comp_name'], args['num_employees'], args['user_id'], 0)
+                    f"""
+                    INSERT INTO Companies (CompanyName, NumberOfEmployees, AdminUserID, Revenue)
+                    VALUES ({args['comp_name']}, {args['num_employees']}, {args['user_id']}, 0)
+                    """
                 )
                 connection.commit()
                 result = cursor.lastrowid
@@ -216,8 +218,10 @@ class DBConnector:
 
             elif query == 'create_client':
                 cursor.execute(
-                    "INSERT INTO Clients (FirstName, LastName, Email, PhoneNumber, Address, City, Country, CompanyID, CreatedAt) VALUES (?, ?, ?, ?, ?, ? ,?, ?, CURRENT_TIMESTAMP)",
-                    (args['first_name'], args['last_name'], args['email'], args['phone_number'], args['address'], args['city'], args['country'], args['comp_id'])
+                    f"""
+                    INSERT INTO Clients (FirstName, LastName, Email, PhoneNumber, Address, City, Country, CompanyID, CreatedAt)
+                    VALUES ({args['first_name']}, {args['last_name']}, {args['email']}, {args['phone_number']}, {args['address']}, {args['city']}, {args['country']}, {args['comp_id']}, CURRENT_TIMESTAMP)
+                    """
                 )
                 connection.commit()
                 result = cursor.lastrowid
@@ -228,8 +232,10 @@ class DBConnector:
             
             elif query == 'create_sale':
                 cursor.execute(
-                    "INSERT INTO Sales (UserID, ClientID, ProductName, Quantity, Price, SaleDate) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)",
-                    (args['user_id'], args['client_id'], args['product'], args['quantity'], args['price'])
+                    f"""
+                    INSERT INTO Sales (UserID, ClientID, ProductName, Quantity, Price, SaleDate)
+                    VALUES ({args['user_id']}, {args['client_id']}, {args['product']}, {args['quantity']}, {args['price']}, CURRENT_TIMESTAMP)
+                    """
                 )
                 connection.commit()
                 result = cursor.lastrowid
@@ -241,8 +247,9 @@ class DBConnector:
 
             elif query == 'update_user_password':
                 cursor.execute(
-                    "UPDATE Users SET PasswordHash = ? WHERE UserID = ?;",
-                    (args["new_password"], args["user_id"])
+                    f"""
+                    UPDATE Users SET PasswordHash = {args["new_password"]} WHERE UserID = {args["user_id"]};
+                    """
                 )
                 connection.commit()
                 result = cursor.rowcount
@@ -255,8 +262,9 @@ class DBConnector:
 
             elif query == 'update_user_comp_id':
                 cursor.execute(
-                    "UPDATE Users SET CompanyID = ? WHERE UserID = ?;",
-                    (args["comp_id"], args["user_id"])
+                    f"""
+                    UPDATE Users SET CompanyID = {args["comp_id"]} WHERE UserID = {args["user_id"]}
+                    """
                 )
                 connection.commit()
                 result = cursor.rowcount
@@ -269,9 +277,9 @@ class DBConnector:
 
             elif query == 'update_user_activity':
                 if args['active']:
-                    cursor.execute("UPDATE Users SET LastLogin = CURRENT_TIMESTAMP, isActive = True WHERE UserID = ?", (args['user_id'],))
+                    cursor.execute(f"UPDATE Users SET LastLogin = CURRENT_TIMESTAMP, isActive = True WHERE UserID = {args['user_id']}")
                 else:
-                    cursor.execute("UPDATE Users SET LastLogout = CURRENT_TIMESTAMP, isActive = False WHERE UserID = ?", (args['user_id'],))
+                    cursor.execute(f"UPDATE Users SET LastLogout = CURRENT_TIMESTAMP, isActive = False WHERE UserID = {args['user_id']}")
                 connection.commit()
                 result = cursor.rowcount
                 if isinstance(result, tuple):
@@ -279,13 +287,13 @@ class DBConnector:
                 return result
 
             elif query == 'delete_users_by_comp_id':
-                cursor.execute("DELETE FROM Users WHERE CompanyID = ?", (args,))
+                cursor.execute(f"DELETE FROM Users WHERE CompanyID = {args}")
                 connection.commit()
                 result = cursor.rowcount
                 return True
 
             elif query == 'delete_user_by_id':
-                cursor.execute("DELETE FROM Users WHERE UserID = ?", (args,))
+                cursor.execute(f"DELETE FROM Users WHERE UserID = {args}")
                 connection.commit()
                 result = cursor.rowcount
                 print(result)
@@ -297,7 +305,7 @@ class DBConnector:
                     return False
 
             elif query == 'delete_company_by_id':
-                cursor.execute("DELETE FROM Companies WHERE CompanyID = ?", (args,))
+                cursor.execute(f"DELETE FROM Companies WHERE CompanyID = {args}")
                 connection.commit()
                 result = cursor.rowcount
                 if isinstance(result, tuple):
@@ -308,7 +316,7 @@ class DBConnector:
                     return False
 
             elif query == 'delete_client_by_id':
-                cursor.execute("DELETE FROM Clients WHERE ClientID = ?", (args,))
+                cursor.execute(f"DELETE FROM Clients WHERE ClientID = {args}")
                 connection.commit()
                 result = cursor.rowcount
                 if isinstance(result, tuple):
@@ -321,7 +329,6 @@ class DBConnector:
         except mariadb.Error as e:
             print(f"Error: {e}")
             result = None
-
         finally:
             cursor.close()
             connection.close()

@@ -11,7 +11,8 @@ setup(
         # List your package dependencies here, or load them from requirements.txt
         "Flask==2.3.1",
         "Flask-Cors==3.0.9",
-        "mariadb==1.1.5"
+        "mariadb==1.1.5",
+        "requests==2.19.1"
     ],
     entry_points={
         "console_scripts": [
