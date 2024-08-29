@@ -2,7 +2,7 @@
 <a id="readme-top"></a>
 <br />
 <div align="center">
-  <img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fconhecimentoinovacao.iscte-iul.pt%2F&psig=AOvVaw0-uupha0N7JwPwGMv9M4kQ&ust=1725037244802000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCOje-tLWmogDFQAAAAAdAAAAABAE" alt="Logo" width="80" height="80">
+  <img src="rgb_iscte_pt_horizontal_positive.png" alt="Logo" width="500" height="150">
 
   <h3 align="center">IscteSpot</h3>
 
