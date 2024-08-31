@@ -1,7 +1,7 @@
 import mariadb
 
 connection = mariadb.connect(
-	host="mariadb",
+	host="localhost",
 	user="root",
 	password="teste123",
 	port=3306

@@ -62,7 +62,6 @@ list_clients_response = requests.get(list_clients_url, json=list_clients_payload
 list_clients_data = list_clients_response.json()
 if list_clients_data['status'] == 'Ok':
     test_output_status('pass', 'List clients  success')
-    print(list_clients_data['clients'])
 else:
     test_output_status('fail', 'List clients failed')
 
@@ -109,7 +108,6 @@ list_employees_response = requests.get(list_employees_url, json=list_employees_p
 list_employees_data = list_employees_response.json()
 if list_employees_data['status'] == 'Ok':
     test_output_status('pass', 'List employees  success')
-    print(list_employees_data['employees'])
 else:
     test_output_status('fail', 'List employees failed')
 
@@ -241,7 +239,6 @@ analytics_response = requests.get(analytics_url, json=analytics_payload)
 analytics_data = analytics_response.json()
 if analytics_data['status'] == 'Ok':
     sales = analytics_data['sales']
-    print(sales)
     test_output_status('pass', 'Company analytics success')
 else:
     test_output_status('fail', 'Company analytics failed')

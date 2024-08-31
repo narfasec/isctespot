@@ -1,8 +1,29 @@
 from flask import Flask, Blueprint, request, jsonify, current_app
 from db.db_connector import DBConnector
-import json
+from Crypto.Cipher import DES
+from Crypto.Util.Padding import pad, unpad
+import base64
 
 auth = Blueprint('auth', __name__)
+
+# Utility functions for DES encryption and decryption
+def encrypt_password(password: str, key: str) -> str:
+    des = DES.new(key.encode('utf-8'), DES.MODE_ECB)
+    padded_password = pad(password.encode('utf-8'), DES.block_size)
+    encrypted_password = des.encrypt(padded_password)
+    return base64.b64encode(encrypted_password).decode('utf-8')
+
+def decrypt_password(encrypted_password: str, key: str) -> str:
+    print(f'Encrypted password: {encrypted_password}')
+    des = DES.new(key.encode('utf-8'), DES.MODE_ECB)
+    decoded_encrypted_password = base64.b64decode(encrypted_password)
+    print(f'Decoded password: {decoded_encrypted_password}')
+    decrypted_password = unpad(des.decrypt(decoded_encrypted_password), DES.block_size)
+    print(f'Decrypted password: {decrypted_password}')
+    return decrypted_password.decode('utf-8')
+
+# Using a weak DES key for educational purposes
+DES_KEY = "12345678"  # 8 characters long, easily cracked
 
 @auth.route('/login', methods=['POST'])
 def login():
@@ -11,11 +32,15 @@ def login():
     dict_data = request.get_json()
     username = dict_data['username']
     password = dict_data['password']
+
     _id = dbc.execute_query(query='get_user_by_name', args=username)
     if not isinstance(_id, int):
         return jsonify({'status': 'Bad request'}), 400
-    _password = dbc.execute_query(query='get_user_password', args=password)
-    if password == _password:
+
+    encrypted_password = dbc.execute_query(query='get_user_password', args=_id)
+    decrypted_password = str(decrypt_password(encrypted_password, DES_KEY))
+    print(f'Password comparsion!! input: {password} vs decrypted_password: {decrypted_password}')
+    if password == decrypted_password:
         result = dbc.execute_query(query='update_user_activity', args={
             'user_id': _id,
             'active': True
@@ -28,10 +53,13 @@ def login():
         else:
             is_admin = 'false'
             token = current_app.config['AUTH_TOKEN']
+
         comp_id = dbc.execute_query(query='get_user_comp_id', args=_id)
         if not isinstance(comp_id, int):
             return jsonify({'status': 'Bad request'}), 400
+
         return jsonify({'status': 'Ok', 'user_id': _id, 'token': token, 'is_admin': is_admin, 'comp_id': comp_id}), 200
+
     return jsonify({'status': 'Bad credentials'}), 403
 
 @auth.route('/logout', methods=['POST'])
@@ -56,13 +84,15 @@ def reset_password():
     user_id = dict_data['user_id']
     new_password = dict_data['new_password']
     token = dict_data['token']
-    
+
     if token != current_app.config["AUTH_TOKEN"] and token != current_app.config["ADMIN_AUTH_TOKEN"]:
         return jsonify({'status': 'Unauthorised'}), 403
+
+    encrypted_password = encrypt_password(new_password, DES_KEY)
     
     result = dbc.execute_query(query='update_user_password', args={
         "user_id": user_id,
-        "new_password": new_password
+        "new_password": encrypted_password
     })
     if result is True:
         return jsonify({'status': 'Ok'}), 200
@@ -75,15 +105,18 @@ def signup():
     dbc = DBConnector()
     dict_data = request.get_json()
     user_id = 0
+    
+    encrypted_password = encrypt_password(dict_data['password'], DES_KEY)
+    
     result = dbc.execute_query('create_user_admin', args={
         "username": dict_data['username'],
-        "password": dict_data['password'],
+        "password": encrypted_password,
         "email": dict_data['email'],
         "comp_name": dict_data['comp_name'],
         "num_employees": dict_data['num_employees'],
         "is_admin": True 
     })
-    if isinstance(result,int):
+    if isinstance(result, int):
         user_id = result
     else:
         return jsonify({'status': 'Bad request'}), 400
@@ -97,7 +130,7 @@ def signup():
         'user_id': user_id,
         'comp_id': comp_id
     })
-    if isinstance(result,int):
+    if isinstance(result, int):
         return jsonify(
             {
                 'status': 'Ok',
