@@ -15,7 +15,7 @@ def test_output_status(status, text):
         print(f'\033[91m[FAIL]\033[0m {text}')
         sys.exit(1)
 
-# User login
+# Admin logs-in
 test_output_status('info', 'Testing User authentication')
 login_url = f'{base_url}/login'
 login_payload = {'username': 'jdoe', 'password': 'teste123'}
@@ -27,9 +27,20 @@ if login_data['status'] == 'Ok':
     user_id = login_data['user_id']
 else:
     test_output_status('fail', 'Failed to Login user')
-    
 
-# Admin logs-in
+# Admin lists products
+list_products_url = f'{base_url}/products'
+list_products_payload = {
+    'comp_id': 1,
+    'token': ADMIN_AUTH_TOKEN
+}
+list_products_response = requests.post(login_url, json=login_payload)
+list_products_data = list_products_response.json()
+if list_products_data['status'] == 'Ok':
+    test_output_status('pass', 'Products list success')
+else:
+    test_output_status('fail', 'Products list failed')
+
 # Admin updates products with file
 update_products_url = f'{base_url}/update_products'
 update_products_payload = {

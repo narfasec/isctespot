@@ -36,6 +36,7 @@ class DBConnector:
                         'get_employees_list'        args:company_id     |       return: list of employees
                         'get_user_admin'            args:user_id        |       return: is_admin value (True or False)
                         'get_user_comp_id'          args:user_id        |       return: comp_id
+                        'get_products_list'         args:comp_id        |       return: list of products
                     CREATE
                         'create_user_employee'      args: {username, email, company_id}
                         'create_user_admin'         args: {username, password, email}
@@ -174,6 +175,14 @@ class DBConnector:
                 else:
                     return result['CompanyID']
 
+            elif query == 'get_products_list':
+                cursor.execute(f"SELECT ProductID, ProductName FROM Products WHERE CompanyID = {args}")
+                result = cursor.fetchall()
+                if isinstance(result, list):
+                    return result
+                else:
+                    return False
+            
             elif query == 'create_user_employee':
                 
                 cursor.execute(

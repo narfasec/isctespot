@@ -28,8 +28,20 @@ def list_employees():
     results = dbc.execute_query(query='get_employees_list', args=dict_data['comp_id'])
     if isinstance(results, list):
         return jsonify({'status': 'Ok', 'employees': results}), 200
-    return jsonify({'status': 'Bad credentials'}), 403
+    return jsonify({'status': 'Bad request'}), 403
 
+@company.route('/products', methods=['GET', 'POST'])
+def list_products():
+    ''' List products for given company '''
+    dbc = DBConnector()
+    dict_data = request.get_json()
+    if dict_data['token'] != current_app.config['ADMIN_AUTH_TOKEN']:
+        return jsonify({'status': 'Unauthorised'}), 403
+    results = dbc.execute_query(query='get_products_list', args=dict_data['comp_id'])
+    if isinstance(results, list):
+        return jsonify({'status': 'Ok', 'products': results}), 200
+    return jsonify({'status': 'Bad request'}), 403
+    
 @company.route('/update_products/', methods=['POST'])
 def upload_excel():
     ''' Update company products from csv or xlsx '''
