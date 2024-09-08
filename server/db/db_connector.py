@@ -37,6 +37,7 @@ class DBConnector:
                         'get_user_admin'            args:user_id        |       return: is_admin value (True or False)
                         'get_user_comp_id'          args:user_id        |       return: comp_id
                         'get_products_list'         args:comp_id        |       return: list of products
+                        'get_company_revenue'       args:comp_id        |       return: revenue
                     CREATE
                         'create_user_employee'      args: {username, email, company_id}
                         'create_user_admin'         args: {username, password, email}
@@ -47,6 +48,7 @@ class DBConnector:
                         'update_user_password'      args: {user_id, new_password}
                         'update_user_comp_id'       args: {user_id, comp_id}
                         'update_products_by_comp_id args: {file, comp_id}
+                        'update_company_revenue'    args: comp_id
                     DELETE
                         'delete_users_by_comp_id'   args: {user_id, company_id}
                         'delete_user_by_id'         args: user_id
@@ -182,9 +184,47 @@ class DBConnector:
                     return result
                 else:
                     return False
+
+            elif query == 'get_company_revenue':
+                cursor.execute(f"SELECT Revenue FROM Companies WHERE CompanyID = {args}")
+                result = cursor.fetchone()
+                if isinstance(result, tuple):
+                    return result[0]
+                return result['Revenue']
             
+            elif query == 'get_employees_return':
+                cursor.execute(
+                    f"""
+                    SELECT 
+                        u.UserID,
+                        u.Username,
+                        u.CommissionPercentage,
+                        COUNT(s.SaleID) AS total_sales,
+                        SUM(s.Price * s.Quantity) AS total_sales_amount,
+                        (SUM(s.Price * s.Quantity) * (u.CommissionPercentage / 100)) AS total_commission
+                    FROM Users u
+                    LEFT JOIN Sales s ON u.UserID = s.UserID
+                    WHERE u.CompanyID = {args}
+                    GROUP BY u.UserID, u.CommissionPercentage
+                    """
+                )
+                result = cursor.fetchall()
+                # Format the result into a list of dictionaries
+                employee_sales_data = []
+                print(f'Result: {result}')
+                for row in result:
+                    employee_sales_data.append({
+                        "UserID": row['UserID'],
+                        "Username": row['Username'],
+                        "CommissionPercentage": row['CommissionPercentage'],
+                        "TotalSales": row['total_sales'],
+                        "TotalSalesAmount": row['total_sales_amount'],
+                        "TotalCommission": row['total_commission']
+                    })
+
+                return employee_sales_data
+
             elif query == 'create_user_employee':
-                
                 cursor.execute(
                     "INSERT INTO Users (Username, PasswordHash, Email, CompanyID, CommissionPercentage, CreatedAt) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)",
                     (args['username'], 'T3MP-password-32',args['email'], args['comp_id'], 5)
@@ -304,6 +344,30 @@ class DBConnector:
                 print(f"Inserted new products for CompanyID {args['comp_id']}")
                 
                 return True
+            
+            elif query == 'update_company_revenue':
+
+                cursor.execute(
+                    f"""
+                    SELECT SUM(Price * Quantity) 
+                    FROM Sales
+                    WHERE CompanyID = {args}
+                    """
+                )
+                result = cursor.fetchone()
+                if isinstance(result, tuple):
+                    result = result[0]
+                
+                cursor.execute(
+                    f"""
+                    UPDATE Companies
+                    SET Revenue = {result}
+                    WHERE CompanyID = {args}
+                    """
+                )
+                connection.commit()
+                affected_rows = cursor.rowcount
+                return affected_rows > 0
 
             elif query == 'delete_users_by_comp_id':
                 cursor.execute(f"DELETE FROM Users WHERE CompanyID = {args}")

@@ -62,4 +62,20 @@ if update_products_data['status'] == 'Ok':
     test_output_status('pass', 'Products update success')
 else:
     test_output_status('fail', 'Products update failed')
+
+# Admin calculates cashflow
+cash_flow_url = f'{base_url}/cash-flow'
+cash_flow_payload = {
+    'comp_id': 1,
+    'country_code': 'PT',
+    'token': ADMIN_AUTH_TOKEN
+}
+
+cash_flow_response = requests.post(cash_flow_url, json=cash_flow_payload)
+cash_flow_data = cash_flow_response.json()
+if cash_flow_data['status'] == 'Ok':
+    test_output_status('pass', 'Cash flow calculated')
+else:
+    test_output_status('fail', 'Cash flow failed')
+
 # Admin logs-out
