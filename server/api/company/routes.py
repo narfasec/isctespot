@@ -1,6 +1,7 @@
 from flask import Flask, Blueprint, request, jsonify, current_app
 from db.db_connector import DBConnector
-import json
+from services.process_file import ProcessFile
+import os
 
 company = Blueprint('company', __name__)
 
@@ -28,3 +29,33 @@ def list_employees():
     if isinstance(results, list):
         return jsonify({'status': 'Ok', 'employees': results}), 200
     return jsonify({'status': 'Bad credentials'}), 403
+
+@company.route('/update_products/', methods=['POST'])
+def upload_excel():
+    ''' Update company products from csv or xlsx '''
+    # Get the token and comp_id from form data (not JSON)
+    token = request.form.get('token')
+    comp_id = request.form.get('comp_id')
+
+    # Verify the admin token
+    if token != current_app.config['ADMIN_AUTH_TOKEN']:
+        return jsonify({'status': 'Unauthorized'}), 403
+
+    # Check if the request contains a file part
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part in the request'}), 400
+
+    file = request.files['file']
+
+    # Check if a file was selected
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+    filename = file.filename
+
+    # Send the file to be processed (assuming ProcessFile handles the logic)
+    pf = ProcessFile(file, comp_id)
+    if not pf.is_updated:
+        return jsonify({'error': 'File processing failed'}), 400
+
+    return jsonify({'status': 'Ok','message': 'File successfully uploaded'}), 200

@@ -2,7 +2,7 @@ import mariadb
 import sys
 class DBConnector:
 
-    def __init__(self ):
+    def __init__(self):
         self.host = 'localhost'
         self.user = 'root'
         self.password = 'teste123'
@@ -45,6 +45,7 @@ class DBConnector:
                     UPDATE
                         'update_user_password'      args: {user_id, new_password}
                         'update_user_comp_id'       args: {user_id, comp_id}
+                        'update_products_by_comp_id args: {file, comp_id}
                     DELETE
                         'delete_users_by_comp_id'   args: {user_id, company_id}
                         'delete_user_by_id'         args: user_id
@@ -273,6 +274,27 @@ class DBConnector:
                 if isinstance(result, tuple):
                     result = result[0]
                 return result
+            
+            elif query == 'update_products_by_comp_id':
+                cursor.execute(
+                    f"""
+                    DELETE FROM Products WHERE CompanyID = {args['comp_id']}
+                    """
+                )
+                print('Products have been deleted')
+                
+                insert_query = """
+                    INSERT INTO Products (ProductID, CompanyID, ProductName, CreatedAt)
+                    VALUES (?, ?, ?, ?)
+                """
+
+                for index, row in args['file'].iterrows():
+                    cursor.execute(insert_query, (row['ProductID'], args['comp_id'], row['ProductName'], row['CreatedAt']))
+        
+                connection.commit()
+                print(f"Inserted new products for CompanyID {args['comp_id']}")
+                
+                return True
 
             elif query == 'delete_users_by_comp_id':
                 cursor.execute(f"DELETE FROM Users WHERE CompanyID = {args}")

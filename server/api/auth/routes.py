@@ -6,7 +6,6 @@ import base64
 
 auth = Blueprint('auth', __name__)
 
-# Utility functions for DES encryption and decryption
 def encrypt_password(password: str, key: str) -> str:
     des = DES.new(key.encode('utf-8'), DES.MODE_ECB)
     padded_password = pad(password.encode('utf-8'), DES.block_size)
@@ -22,8 +21,7 @@ def decrypt_password(encrypted_password: str, key: str) -> str:
     print(f'Decrypted password: {decrypted_password}')
     return decrypted_password.decode('utf-8')
 
-# Using a weak DES key for educational purposes
-DES_KEY = "12345678"  # 8 characters long, easily cracked
+DES_KEY = "12345678"
 
 @auth.route('/login', methods=['POST'])
 def login():
