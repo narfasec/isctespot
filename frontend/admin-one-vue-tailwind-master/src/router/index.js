@@ -85,6 +85,15 @@ const routes = [
     name: 'cash-flow',
     component: () => import('@/views/CompanyCashFlowView.vue')
   },
+  {
+    meta: {
+      title: 'Products',
+      requiresAuth: true
+    },
+    path: '/company/products',
+    name: 'products',
+    component: () => import('@/views/CompanyProductsView.vue')
+  },
   ////////////////////////////////////////////////////////////////////////////////////////////////////////
   {
     meta: {

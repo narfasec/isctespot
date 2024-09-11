@@ -92,11 +92,11 @@ if (localStorage.getItem('isAdmin') === 'true') {
         label: 'Employees'
       },
       {
-        company: 'company/cash-flow',
+        to: '/company/cash-flow',
         label: 'Cash Flow'
       },
       {
-        company: 'company/products',
+        to: '/company/products',
         label: 'Products'
       }
     ]

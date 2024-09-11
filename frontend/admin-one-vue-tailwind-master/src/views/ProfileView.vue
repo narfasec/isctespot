@@ -61,38 +61,6 @@ const submitPass = () => {
       <UserCard class="mb-6" />
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- <CardBox is-form @submit.prevent="submitProfile">
-          <FormField label="Avatar" help="Max 500kb">
-            <FormFilePicker label="Upload" />
-          </FormField>
-
-          <FormField label="Name" help="Required. Your name">
-            <FormControl
-              v-model="profileForm.name"
-              :icon="mdiAccount"
-              name="username"
-              required
-              autocomplete="username"
-            />
-          </FormField>
-          <FormField label="E-mail" help="Required. Your e-mail">
-            <FormControl
-              v-model="profileForm.email"
-              :icon="mdiMail"
-              type="email"
-              name="email"
-              required
-              autocomplete="email"
-            />
-          </FormField>
-
-          <template #footer>
-            <BaseButtons>
-              <BaseButton color="info" type="submit" label="Submit" />
-              <BaseButton color="info" label="Options" outline />
-            </BaseButtons>
-          </template>
-        </CardBox> -->
 
         <CardBox is-form @submit.prevent="submitPass">
           <FormField label="Current password" help="Required. Your current password">
