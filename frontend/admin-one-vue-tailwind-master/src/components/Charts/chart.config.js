@@ -36,7 +36,7 @@ const datasetObject = (color, points) => {
   }
 }
 
-export const sampleChartData = (points = 9) => {
+export const sampleChartData = (points = 10) => {
   const labels = []
 
   for (let i = 1; i <= points; i++) {

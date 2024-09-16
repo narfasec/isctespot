@@ -7,7 +7,6 @@ def get_vat_rate(country_code):
         'IT': 22,   # Italy
         'ES': 21,   # Spain
         'UK': 20,   # United Kingdom
-        'US': 0,    # United States (no VAT, sales tax varies by state)
         'NL': 21,   # Netherlands
         'SE': 25,   # Sweden
         'PT': 23,   # Portugal

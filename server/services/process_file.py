@@ -8,7 +8,7 @@ class ProcessFile:
     def __init__(self, file, comp_id):
         self.comp_id = comp_id
         self.file = file
-        self.dir = '/files/'
+        self.dir = os.path.join(os.path.dirname(__file__), 'files')
         self.status = False
         self.file_path = self.save_file()
         self.update_products_from_file(self.file_path)
@@ -18,6 +18,7 @@ class ProcessFile:
         filename = self.file.filename
         comp_folder = os.path.join(self.dir, str(self.comp_id))
         os.makedirs(comp_folder, exist_ok=True)
+        print(comp_folder)
 
         # Save the file
         file_path = os.path.join(comp_folder, filename)

@@ -14,6 +14,7 @@ class ProcessCashFlow:
         self.invoice: float = 0
         self.employees: list = []
         self.profit: float = 0.0
+        self.total_payment: float = 0.0
   
         self.start()
 
@@ -68,7 +69,7 @@ class ProcessCashFlow:
         ''' Calculate cash flow '''
         total_payment: float = 0.0
         for employee in self.employees:
-            total_payment = total_payment + float(employee['TotalCommission'])
+            self.total_payment = total_payment + float(employee['TotalCommission'])
         print(f'{self.revenue} * ({self.vat} * 0.01) - {total_payment}')
         print(self.revenue * (self.vat*0.01))
         self.profit = self.revenue - (self.revenue * (self.vat * 0.01)) - total_payment

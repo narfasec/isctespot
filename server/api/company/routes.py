@@ -72,8 +72,10 @@ def cash_flow():
     return jsonify(
         {
             'status': 'Ok',
+            'revenue': pcf.revenue,
             'profit': pcf.profit,
             'employees': pcf.employees,
-            'vat': pcf.vat
+            'vat': pcf.vat,
+            'totalEmployeesPayment': pcf.total_payment
         }
     ), 200

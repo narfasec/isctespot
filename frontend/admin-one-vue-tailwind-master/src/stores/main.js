@@ -21,6 +21,7 @@ export const useMainStore = defineStore('main', () => {
   const _employees = ref([])
   const products = ref([])
   const totalRevenue = ref([])
+  const cashFlow = ref([])
   // const userName = ref()
 
   function setUser(payload) {
@@ -136,6 +137,27 @@ export const useMainStore = defineStore('main', () => {
     });
   }
 
+  function getCompanyCashFlow() {
+    const url = "http://localhost:5000/cash-flow"
+    const cashFlowPayload = {
+      country_code: 'PT',
+      token: localStorage.getItem('token'),
+      comp_id: localStorage.getItem('companyId')
+    };
+    axios
+      .post(url, cashFlowPayload)
+      .then((r) => {
+        this.cashFlow = r.data
+        console.log(r.data)
+        console.log('fftcvhgj')
+      })
+      .catch((error) => {
+        alert(error.message);
+    });
+    
+    
+  }
+
   function deleteEmployee(employee_id){
     const url = "http://localhost:5000/employee/delete"
     const employeesPayload = {
@@ -177,6 +199,7 @@ export const useMainStore = defineStore('main', () => {
     _employees,
     products,
     totalRevenue,
+    cashFlow,
     setUser,
     fetchSampleClients,
     fetchSampleHistory,
@@ -185,6 +208,7 @@ export const useMainStore = defineStore('main', () => {
     getClients,
     getCompanyEmployees,
     getCompanyProducts,
+    getCompanyCashFlow,
     deleteEmployee,
     calculateSalesRevenue
   }
