@@ -26,8 +26,7 @@ def add_new_sale():
     result = dbc.execute_query(query='create_sale', args={
         'client_id': dict_data['client_id'],
         'user_id': dict_data['user_id'],
-        'product': dict_data['product'],
-        'price': dict_data['price'],
+        'product_id': dict_data['product_id'],
         'quantity': dict_data['quantity']
     })
     if isinstance(result, int):

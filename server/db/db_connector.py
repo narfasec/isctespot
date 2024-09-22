@@ -126,7 +126,7 @@ class DBConnector:
             elif query == 'get_company_sales':
                 cursor.execute(
                     f"""
-                    SELECT Sales.SaleID, Sales.UserID, Sales.ClientID, Sales.ProductName, Sales.Quantity, Sales.Price, Sales.SaleDate
+                    SELECT Sales.SaleID, Sales.UserID, Sales.ClientID, Sales.ProductID, Sales.Quantity, Sales.SaleDate
                     FROM Sales
                     JOIN Clients ON Sales.ClientID = Clients.ClientID
                     WHERE Clients.CompanyID = {args};
@@ -274,8 +274,8 @@ class DBConnector:
             
             elif query == 'create_sale':
                 cursor.execute(
-                    "INSERT INTO Sales (UserID, ClientID, ProductName, Quantity, Price, SaleDate) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)",
-                    (args['user_id'], args['client_id'], args['product'], args['quantity'], args['price'])
+                    "INSERT INTO Sales (UserID, ClientID, ProductID, Quantity, SaleDate) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)",
+                    (args['user_id'], args['client_id'], args['product_id'], args['quantity'])
                 )
                 connection.commit()
                 result = cursor.lastrowid
@@ -333,12 +333,12 @@ class DBConnector:
                 print('Products have been deleted')
                 
                 insert_query = """
-                    INSERT INTO Products (ProductID, CompanyID, ProductName, CreatedAt)
-                    VALUES (?, ?, ?, ?)
+                    INSERT INTO Products (ProductID, CompanyID, ProductName, FactoryPrice, SellingPrice, CreatedAt)
+                    VALUES (?, ?, ?, ?, ?, ?)
                 """
 
                 for index, row in args['file'].iterrows():
-                    cursor.execute(insert_query, (row['ProductID'], args['comp_id'], row['ProductName'], row['CreatedAt']))
+                    cursor.execute(insert_query, (row['ProductID'], args['comp_id'], row['ProductName'],row['FactoryPrice'], row['SellingPrice'],  row['CreatedAt']))
                 
                 connection.commit()
                 print(f"Inserted new products for CompanyID {args['comp_id']}")
@@ -370,6 +370,29 @@ class DBConnector:
                 affected_rows = cursor.rowcount
                 return affected_rows > 0
 
+            elif query == 'delete_sales_by_comp_id':
+                cursor.execute(
+                    f"""
+                    DELETE FROM sales
+                    WHERE UserID IN (
+                        SELECT UserID
+                        FROM users
+                        WHERE CompanyID = {args}
+                    );
+
+                    """)
+                connection.commit()
+                result = cursor.rowcount
+                print('Deleting Sales')
+                print(result)
+                return True
+            
+            elif query == 'delete_products_by_comp_id':
+                cursor.execute(f"DELETE FROM Products WHERE CompanyID = {args}")
+                connection.commit()
+                result = cursor.rowcount
+                return True
+            
             elif query == 'delete_users_by_comp_id':
                 cursor.execute(f"DELETE FROM Users WHERE CompanyID = {args}")
                 connection.commit()

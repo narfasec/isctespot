@@ -86,34 +86,36 @@ def insert_clients():
 def insert_products():
     fake_products_tuples = [
         (
-            company["ProductID"],
-            company["CompanyID"],
-            company["ProductName"],
-            company["CreatedAt"]
+            product["ProductID"],
+            product["CompanyID"],
+            product["ProductName"],
+            product["FactoryPrice"],
+            product["SellingPrice"],
+            product["CreatedAt"]
         )
-        for company in fake_products
+        for product in fake_products
     ]
     cursor.executemany("""
-    INSERT INTO products (ProductID, CompanyID, ProductName, CreatedAt)
-    VALUES (%s, %s, %s, %s)
+    INSERT INTO products (ProductID, CompanyID, ProductName, FactoryPrice, SellingPrice, CreatedAt)
+    VALUES (%s, %s, %s, %s, %s, %s)
     """, fake_products_tuples)
     db.commit()
+
 # Function to insert data into the 'sales' table
 def insert_sales():
     fake_sales_tuples = [
         (
             sale["UserID"],
             sale["ClientID"],
-            sale["ProductName"],
-            sale["Quantity"],
-            sale["Price"],
+            sale["ProductID"],
+            sale['Quantity'],
             sale["SaleDate"]
         )
         for sale in fake_sales
     ]
     cursor.executemany("""
-    INSERT INTO sales (UserID, ClientID, ProductName, Quantity, Price, SaleDate)
-    VALUES (%s, %s, %s, %s, %s, %s)
+    INSERT INTO sales (UserID, ClientID, ProductID, Quantity, SaleDate)
+    VALUES (%s, %s, %s, %s, %s)
     """, fake_sales_tuples)
     db.commit()
 

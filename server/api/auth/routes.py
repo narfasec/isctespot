@@ -165,6 +165,12 @@ def retire():
     dict_data = request.get_json()
     if dict_data['token'] != current_app.config['ADMIN_AUTH_TOKEN']:
         return jsonify({'status': 'Unauthorized'}), 403
+    result = dbc.execute_query(query='delete_sales_by_comp_id', args=dict_data['comp_id'])
+    if result is False:
+        return jsonify({'status': 'Bad request'}), 400
+    result = dbc.execute_query(query='delete_products_by_comp_id', args=dict_data['comp_id'])
+    if result is False:
+        return jsonify({'status': 'Bad request'}), 400
     result = dbc.execute_query(query='delete_users_by_comp_id', args=dict_data['comp_id'])
     if result is False:
         return jsonify({'status': 'Bad request'}), 400

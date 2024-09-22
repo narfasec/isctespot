@@ -1,0 +1,4 @@
+ProductID,CompanyID,ProductName,FactoryPrice,SellingPrice,CreatedAt
+90,1,Smartphone Z,250.00,799.00,22024-08-01 10:00:00
+91,1,Wireless Earbuds Pro,50.00,169.00,2024-08-02 10:00:00
+92,1,4K Television Atmos,375.00,999.00,2024-08-03 10:00:00

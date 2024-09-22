@@ -1,10 +1,10 @@
 import mariadb
 
 connection = mariadb.connect(
-	host="localhost",
-	user="root",
-	password="teste123",
-	port=3306
+    host="localhost",
+    user="root",
+    password="teste123",
+    port=3306
 )
 
 cursor = connection.cursor()
@@ -44,7 +44,7 @@ try:
     CREATE TABLE IF NOT EXISTS companies (
         CompanyID INT(11) NOT NULL AUTO_INCREMENT,
         AdminUserID INT(11) NOT NULL,
-        NumberOfEmployees VARCHAR(10) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
+        NumberOfEmployees INT(11) NULL DEFAULT NULL,
         Revenue INT(11) NULL DEFAULT NULL,
         CreatedAt TIMESTAMP NULL DEFAULT current_timestamp(),
         CompanyName VARCHAR(255) NOT NULL COLLATE 'latin1_swedish_ci',
@@ -74,37 +74,40 @@ try:
     ENGINE=InnoDB
     AUTO_INCREMENT=1;
 
-    CREATE TABLE IF NOT EXISTS sales (
-        SaleID INT(11) NOT NULL AUTO_INCREMENT,
-        UserID INT(11) NULL,
-        ClientID INT(11) NOT NULL,
-        ProductName VARCHAR(100) NOT NULL COLLATE 'latin1_swedish_ci',
-        Quantity INT(11) NOT NULL,
-        Price DECIMAL(10,2) NOT NULL,
-        SaleDate TIMESTAMP NULL DEFAULT current_timestamp(),
-        PRIMARY KEY (SaleID) USING BTREE,
-        INDEX UserID (UserID) USING BTREE,
-        INDEX ClientID (ClientID) USING BTREE,
-        CONSTRAINT sales_ibfk_1 FOREIGN KEY (UserID) REFERENCES users (UserID) ON UPDATE RESTRICT ON DELETE SET NULL,
-        CONSTRAINT sales_ibfk_2 FOREIGN KEY (ClientID) REFERENCES clients (ClientID) ON UPDATE RESTRICT ON DELETE RESTRICT
+    CREATE TABLE IF NOT EXISTS Products (
+        ProductID INT(11) NOT NULL AUTO_INCREMENT,
+        CompanyID INT(11) NOT NULL,
+        ProductName VARCHAR(255) NOT NULL COLLATE 'latin1_swedish_ci',
+        Category VARCHAR(100) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',  -- New field for product category
+        FactoryPrice DECIMAL(10,2) NOT NULL,
+        SellingPrice DECIMAL(10,2) NOT NULL,
+        CreatedAt TIMESTAMP NULL DEFAULT current_timestamp(),
+        PRIMARY KEY (ProductID) USING BTREE,
+        INDEX CompanyID (CompanyID) USING BTREE,
+        CONSTRAINT products_ibfk_1 FOREIGN KEY (CompanyID) REFERENCES companies (CompanyID) ON UPDATE RESTRICT ON DELETE RESTRICT
     )
     COLLATE='latin1_swedish_ci'
     ENGINE=InnoDB
     AUTO_INCREMENT=1;
     
-    CREATE TABLE IF NOT EXISTS Products (
-		ProductID INT(11) NOT NULL AUTO_INCREMENT,
-		CompanyID INT(11) NOT NULL,
-		ProductName VARCHAR(255) NOT NULL COLLATE 'latin1_swedish_ci',
-		CreatedAt TIMESTAMP NULL DEFAULT current_timestamp(),
-		PRIMARY KEY (ProductID) USING BTREE,
-		INDEX CompanyID (CompanyID) USING BTREE,
-		CONSTRAINT products_ibfk_1 FOREIGN KEY (CompanyID) REFERENCES companies (CompanyID) ON UPDATE RESTRICT ON DELETE RESTRICT
-	)
-	COLLATE='latin1_swedish_ci'
-	ENGINE=InnoDB
- 	AUTO_INCREMENT=1;
- 
+    CREATE TABLE IF NOT EXISTS sales (
+        SaleID INT(11) NOT NULL AUTO_INCREMENT,
+        UserID INT(11) NULL,
+        ClientID INT(11) NULL,
+        ProductID INT(11) NULL,
+        Quantity INT(11) NOT NULL,
+        SaleDate TIMESTAMP NULL DEFAULT current_timestamp(),
+        PRIMARY KEY (SaleID) USING BTREE,
+        INDEX UserID (UserID) USING BTREE,
+        INDEX ClientID (ClientID) USING BTREE,
+        INDEX ProductID (ProductID) USING BTREE,
+        CONSTRAINT sales_ibfk_1 FOREIGN KEY (UserID) REFERENCES users (UserID) ON UPDATE RESTRICT ON DELETE SET NULL,
+        CONSTRAINT sales_ibfk_2 FOREIGN KEY (ClientID) REFERENCES clients (ClientID) ON UPDATE RESTRICT ON DELETE SET NULL,
+        CONSTRAINT sales_ibfk_3 FOREIGN KEY (ProductID) REFERENCES Products (ProductID) ON UPDATE RESTRICT ON DELETE SET NULL
+    )
+    COLLATE='latin1_swedish_ci'
+    ENGINE=InnoDB
+    AUTO_INCREMENT=1;
 
     """
 

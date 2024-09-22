@@ -1,5 +1,6 @@
 import requests
 import sys
+import os
 
 base_url = 'http://127.0.0.1:5000'
 
@@ -83,11 +84,12 @@ signup_payload = {
     'password': 'testpassword',
     'email': 'testadmin@email.com',
     'comp_name': 'Company Test',
-    'num_employees': '1-10',
+    'num_employees': 2,
 }
 signup_response = requests.post(signup_url, json=signup_payload)
 signup_data = signup_response.json()
 comp_id = 0
+user_id = 0
 if signup_data['status'] == 'Ok':
     comp_id = signup_data['comp_id']
     user_id = signup_data['user_id']
@@ -129,64 +131,37 @@ if new_employee_data['status'] == 'Ok':
 else:
     test_output_status('fail', 'Employee creation failed')
 
-# Employee User creates new sale
-test_output_status('info', 'Testing Sale creation')
-new_sale_url = f'{base_url}/sales/new'
-new_sale_payload = {
-    'user_id': employee_id,
-    'client_id': 1,
-    'product': '4K Monitor',
-    'token': AUTH_TOKEN,
-    'quantity': 2,
-    'price': 900,
-}
-
-new_sale_response = requests.post(new_sale_url, json=new_sale_payload)
-new_sale_data = new_sale_response.json()
-sale_id = 0
-if new_sale_data['status'] == 'Ok':
-    sale_id = new_sale_data['sale_id']
-    test_output_status('pass', 'Sale creation success')
-else:
-    test_output_status('fail', 'Sale creation failed')
-
-
-# Delete employee
-test_output_status('info', 'Testing employee deletion')
-delete_employee_url = f'{base_url}/employee/delete'
-delete_employee_payload = {
-    'user_id': 1,
-    'employee_id': employee_id,
-    'token': ADMIN_AUTH_TOKEN,
-}
-delete_employee_response = requests.post(delete_employee_url, json=delete_employee_payload)
-delete_employee_data = delete_employee_response.json()
-if delete_employee_data['status'] == 'Ok':
-    test_output_status('pass', 'Delete employee  success')
-else:
-    test_output_status('fail', 'Delete employee failed')
-
-# Retire
-test_output_status('info', 'Testing retire')
-retire_url = f'{base_url}/retire'
-retire_payload = {
-    'user_id': user_id,
+# Admin updates products with file
+update_products_url = f'{base_url}/update_products'
+update_products_payload = {
     'comp_id': comp_id,
-    'token': ADMIN_AUTH_TOKEN,
+    'token': ADMIN_AUTH_TOKEN
 }
-retire_response = requests.post(retire_url, json=retire_payload)
-retire_data = retire_response.json()
-if retire_data['status'] == 'Ok':
-    test_output_status('pass', 'Retire  success')
-else:
-    test_output_status('fail', 'Retire failed')
+file_path = 'flow_2/sample_products.csv'
+base_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Create new client
+# Join it with the relative path
+absolute_path = os.path.join(base_dir, file_path)
+# Open the file in binary mode
+with open(absolute_path, 'rb') as file:
+    # Send the POST request with the file
+    update_products_response = requests.post(
+        update_products_url,
+        data=update_products_payload,
+        files={'file': file}
+    )
+update_products_data = update_products_response.json()
+if update_products_data['status'] == 'Ok':
+    test_output_status('pass', 'Products update success')
+else:
+    test_output_status('fail', 'Products update failed')
+
+# Employee Create new client
 test_output_status('info', 'Testing new client')
 new_client_url = f'{base_url}/clients/new'
 new_client_payload = {
-    'user_id': 1,
-    'comp_id': 1,
+    'user_id': user_id,
+    'comp_id': comp_id,
     'first_name': 'Roger',
     'last_name': 'Schmidt',
     'email': 'roger.schmidt@benfica.pt',
@@ -203,19 +178,48 @@ if new_client_data['status'] == 'Ok':
     test_output_status('pass', 'New client  success')
 else:
     test_output_status('fail', 'New client failed')
-# Trying to create same client
-new_client_response = requests.post(new_client_url, json=new_client_payload)
-new_client_data = new_client_response.json()
-if new_client_data['status'] == 'Ok':
-    test_output_status('fail', 'Client was duplicated')
+
+# Employee User creates new sale
+test_output_status('info', 'Testing Sale creation')
+new_sale_url = f'{base_url}/sales/new'
+new_sale_payload = {
+    'user_id': employee_id,
+    'client_id': client_id,
+    'product_id': 90,
+    'token': AUTH_TOKEN,
+    'quantity': 2,
+}
+
+new_sale_response = requests.post(new_sale_url, json=new_sale_payload)
+new_sale_data = new_sale_response.json()
+sale_id = 0
+if new_sale_data['status'] == 'Ok':
+    sale_id = new_sale_data['sale_id']
+    test_output_status('pass', 'Sale creation success')
 else:
-    test_output_status('pass', 'Failed to be created again')
+    test_output_status('fail', 'Sale creation failed')
+
+# Delete employee
+test_output_status('info', 'Testing employee deletion')
+delete_employee_url = f'{base_url}/employee/delete'
+delete_employee_payload = {
+    'user_id': user_id,
+    'employee_id': employee_id,
+    'token': ADMIN_AUTH_TOKEN,
+}
+delete_employee_response = requests.post(delete_employee_url, json=delete_employee_payload)
+delete_employee_data = delete_employee_response.json()
+if delete_employee_data['status'] == 'Ok':
+    test_output_status('pass', 'Delete employee  success')
+else:
+    test_output_status('fail', 'Delete employee failed')
+
 
 # Delete client
 test_output_status('info', 'Testing delete client')
 delete_client_url = f'{base_url}/clients/delete'
 delete_client_payload = {
-    'user_id': 1,
+    'user_id': user_id,
     'token': ADMIN_AUTH_TOKEN,
     'client_id': client_id
 }
@@ -227,6 +231,21 @@ if delete_client_data['status'] == 'Ok':
 else:
     test_output_status('fail', 'Delete client failed')
 
+# Retire
+test_output_status('info', 'Testing retire')
+retire_url = f'{base_url}/retire'
+retire_payload = {
+    'user_id': user_id,
+    'comp_id': comp_id,
+    'token': ADMIN_AUTH_TOKEN,
+}
+retire_response = requests.post(retire_url, json=retire_payload)
+retire_data = retire_response.json()
+if retire_data['status'] == 'Ok':
+    test_output_status('pass', 'Retire  success')
+else:
+    test_output_status('fail', 'Retire failed')
+    
 # Admin overview
 test_output_status('info', 'Testing analytics')
 analytics_url = f'{base_url}/analytics'

@@ -47,7 +47,7 @@ update_products_payload = {
     'comp_id': 1,
     'token': ADMIN_AUTH_TOKEN
 }
-file_path = 'sample_products.xlsx'
+file_path = 'sample_products.csv'
 
 # Open the file in binary mode
 with open(file_path, 'rb') as file:
