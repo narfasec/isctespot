@@ -9,9 +9,7 @@ import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import BaseButton from '@/components/BaseButton.vue'
 import TableCompanyCashFlowEmployees from '@/components/TableCompanyCashFlowEmployees.vue'
-import * as chartConfig from '@/components/Charts/chart.config.js'
 import * as barChartConfig from '@/components/Charts/barChart.config.js'
-import LineChart from '@/components/Charts/LineChart.vue'
 import BarChart from '@/components/Charts/BarChart.vue'
 
 // Access the main store
@@ -27,11 +25,12 @@ onBeforeMount(() => {
 
 // Watch for changes in the cashflow and trigger chart generation when data is ready
 watch(cashflow, (newCashflow) => {
+  console.log(newCashflow.vat_value)
   if (newCashflow && newCashflow.status === 'Ok') {
     const apiData = {
       profit: newCashflow.profit,
       totalEmployeesPayment: newCashflow.totalEmployeesPayment,
-      vat: newCashflow.vat
+      vat_value: newCashflow.vat_value
     }
 
     // Repeat the same value for 3 months
@@ -48,11 +47,17 @@ watch(cashflow, (newCashflow) => {
     ]
 
     const vatForThreeMonths = [
-      apiData.vat,
-      apiData.vat,
-      apiData.vat
+      parseInt(apiData.vat_value),
+      parseInt(apiData.vat_value),
+      parseInt(apiData.vat_value)
     ]
 
+    const subscription = [
+      500,
+      500,
+      500
+    ]
+    
     // Generate chart data
     chartData.value = barChartConfig.generateBarChartData({
       labels: ['Month 1', 'Month 2', 'Month 3'],  // X-axis labels for months
@@ -72,8 +77,15 @@ watch(cashflow, (newCashflow) => {
           borderWidth: 1
         },
         {
-          label: 'VAT',
+          label: 'VAT value',
           data: vatForThreeMonths,
+          backgroundColor: 'rgba(255, 159, 64, 0.2)',
+          borderColor: 'rgba(255, 159, 64, 1)',
+          borderWidth: 1
+        },
+        {
+          label: 'Subscription',
+          data: subscription,
           backgroundColor: 'rgba(255, 159, 64, 0.2)',
           borderColor: 'rgba(255, 159, 64, 1)',
           borderWidth: 1
@@ -83,21 +95,11 @@ watch(cashflow, (newCashflow) => {
   }
 }, { immediate: true }) // Watcher will run immediately when cashflow is available
 
-const newEmployee = () => {
-  router.push('/company/employees/new')
-}
-
 </script>
 
 <template>
   <LayoutAuthenticated>
     <SectionMain>
-      <CardBox class="mb-6">
-        <div v-if="chartData">
-          <bar-chart :data="chartData" class="h-96" />
-        </div>
-      </CardBox>
-      
       <SectionTitleLineWithButton :icon="mdiTableBorder" title="Cash Flow" main>
         <BaseButton
           target="_blank"
@@ -111,17 +113,19 @@ const newEmployee = () => {
         />
       </SectionTitleLineWithButton>
 
-      <div class="grid grid-cols-1 gap-6">
+      <div class="grid grid-cols-1 gap-6 mb-6">
         <CardBox>
           <div class="p-6">
             <h3 class="text-lg font-semibold">Profit</h3>
-            <p class="text-2xl font-bold text-green-600">{{ cashflow.profit || 0 | currency }}</p>
+            <p class="text-2xl font-bold text-green-600">+{{ cashflow.profit || 0 | currency }} $</p>
           </div>
         </CardBox>
-        <CardBox>
-          <div class="p-6">
-            <h3 class="text-lg font-semibold">VAT</h3>
-            <p class="text-2xl font-bold">{{ cashflow.vat || 0 }}%</p>
+      </div>
+
+      <div class="grid grid-cols-1 gap-6">
+        <CardBox class="mb-6">
+          <div v-if="chartData">
+            <bar-chart :data="chartData" class="h-96" />
           </div>
         </CardBox>
       </div>
@@ -139,10 +143,6 @@ const newEmployee = () => {
           </CardBox>
         </div>
       </div>
-
-      <CardBox class="mb-6" has-table>
-        <TableCompanyCashFlowEmployees/>
-      </CardBox>
     </SectionMain>
   </LayoutAuthenticated>
 </template>
