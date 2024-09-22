@@ -11,6 +11,7 @@ class ProcessCashFlow:
         self.country_code: str = country_code
         self.revenue: float = 0
         self.vat: int = 0
+        self.vat_value = 0
         self.invoice: float = 0
         self.employees: list = []
         self.profit: float = 0.0
@@ -71,5 +72,5 @@ class ProcessCashFlow:
         for employee in self.employees:
             self.total_payment = total_payment + float(employee['TotalCommission'])
         print(f'{self.revenue} * ({self.vat} * 0.01) - {total_payment}')
-        print(self.revenue * (self.vat*0.01))
-        self.profit = self.revenue - (self.revenue * (self.vat * 0.01)) - total_payment
+        self.vat_value = self.revenue * (self.vat*0.01)
+        self.profit = self.revenue - self.vat_value - total_payment

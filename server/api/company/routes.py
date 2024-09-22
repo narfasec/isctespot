@@ -76,6 +76,7 @@ def cash_flow():
             'profit': pcf.profit,
             'employees': pcf.employees,
             'vat': pcf.vat,
+            'vat_value': pcf.vat_value,
             'totalEmployeesPayment': pcf.total_payment
         }
     ), 200

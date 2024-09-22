@@ -339,7 +339,7 @@ class DBConnector:
 
                 for index, row in args['file'].iterrows():
                     cursor.execute(insert_query, (row['ProductID'], args['comp_id'], row['ProductName'], row['CreatedAt']))
-        
+                
                 connection.commit()
                 print(f"Inserted new products for CompanyID {args['comp_id']}")
                 
@@ -349,14 +349,15 @@ class DBConnector:
 
                 cursor.execute(
                     f"""
-                    SELECT SUM(Price * Quantity) 
-                    FROM Sales
-                    WHERE CompanyID = {args}
+                    SELECT SUM(s.Price) AS total_sales
+                    FROM sales s
+                    JOIN users u ON s.UserID = u.UserID
+                    WHERE u.CompanyID = {args};
                     """
                 )
                 result = cursor.fetchone()
-                if isinstance(result, tuple):
-                    result = result[0]
+                if isinstance(result, dict):
+                    result = result['total_sales']
                 
                 cursor.execute(
                     f"""
