@@ -19,8 +19,8 @@ const props = defineProps({
     type: String,
     required: true
   },
-  progress: {
-    type: Number,
+  seller: {
+    type: String,
     default: 0
   },
   text: {
@@ -33,35 +33,6 @@ const props = defineProps({
   }
 })
 
-const pillType = computed(() => {
-  if (props.type) {
-    return props.type
-  }
-
-  if (props.progress) {
-    if (props.progress >= 60) {
-      return 'success'
-    }
-    if (props.progress >= 40) {
-      return 'warning'
-    }
-
-    return 'danger'
-  }
-
-  return 'info'
-})
-
-const pillIcon = computed(() => {
-  return {
-    success: mdiTrendingUp,
-    warning: mdiTrendingNeutral,
-    danger: mdiTrendingDown,
-    info: null
-  }[pillType.value]
-})
-
-const pillText = computed(() => props.text ?? `${props.progress}%`)
 </script>
 
 <template>
@@ -73,10 +44,9 @@ const pillText = computed(() => props.text ?? `${props.progress}%`)
           <h4 class="text-xl text-ellipsis">
             {{ name }}
           </h4>
-          <p class="text-gray-500 dark:text-slate-400">{{ date }} @ {{ login }}</p>
+          <p class="text-gray-500 dark:text-slate-400">{{ date }}</p>
         </div>
       </BaseLevel>
-      <PillTag :color="pillType" :label="pillText" :icon="pillIcon" />
     </BaseLevel>
   </CardBox>
 </template>

@@ -66,6 +66,7 @@ export const useMainStore = defineStore('main', () => {
       .post(url, userOverviewPayload)
       .then((r) => {
         this.sales = r.data.sales
+        this.last3Sales = r.data.last_3_sales
       })
       .catch((error) => {
         alert(error.message);
@@ -180,8 +181,6 @@ export const useMainStore = defineStore('main', () => {
 
   function calculateSalesRevenue() {
     let totalRevenue = 0;
-    console.log('Sales')
-    console.log(this.sales)
     // Iterate through each sale and calculate revenue
     this.sales.forEach((sale) => {
       const revenue = sale.SellingPrice * sale.Quantity;

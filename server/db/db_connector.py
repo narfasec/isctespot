@@ -38,7 +38,7 @@ class DBConnector:
                         'get_user_comp_id'          args:user_id        |       return: comp_id
                         'get_products_list'         args:comp_id        |       return: list of products
                         'get_company_revenue'       args:comp_id        |       return: revenue
-                        'get_last_3_sales'          args:comp_id        |       return: list of last_3_sales
+                        'get_last_3_sales'          args:user_id        |       return: list of last_3_sales
                     CREATE
                         'create_user_employee'      args: {username, email, company_id}
                         'create_user_admin'         args: {username, password, email}
@@ -278,7 +278,7 @@ class DBConnector:
                     return result
                 else:
                     return False
-
+            
             elif query == 'create_user_employee':
                 cursor.execute(
                     "INSERT INTO Users (Username, PasswordHash, Email, CompanyID, CommissionPercentage, CreatedAt) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)",

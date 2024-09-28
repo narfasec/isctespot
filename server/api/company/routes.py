@@ -3,7 +3,6 @@ from db.db_connector import DBConnector
 from services.process_file import ProcessFile
 from services.process_cash_flow import ProcessCashFlow
 from services.process_sales     import ProcessSales
-import os
 
 company = Blueprint('company', __name__)
 
@@ -18,7 +17,7 @@ def list_clients():
     print(results)
     pcf = ProcessCashFlow(dict_data['comp_id'], 'PT')
     revenue = pcf.revenue
-    ps = ProcessSales(results, dict_data['comp_id'])
+    ps = ProcessSales(results, dict_data['user_id'])
     ps.get_3_most_recent_sales()
     if isinstance(results, list):
         return jsonify({'status': 'Ok', 'last_3_sales': ps.last_3_sales, 'revenue': revenue, 'sales': results}), 200
@@ -41,7 +40,7 @@ def list_products():
     ''' List products for given company '''
     dbc = DBConnector()
     dict_data = request.get_json()
-    if dict_data['token'] != current_app.config['ADMIN_AUTH_TOKEN']:
+    if dict_data['token'] != current_app.config['ADMIN_AUTH_TOKEN'] and dict_data['token'] != current_app.config['AUTH_TOKEN']:
         return jsonify({'status': 'Unauthorised'}), 403
     results = dbc.execute_query(query='get_products_list', args=dict_data['comp_id'])
     if isinstance(results, list):
