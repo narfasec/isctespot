@@ -22,7 +22,7 @@ const props = defineProps({
   type: {
     type: String,
     required: true,
-    default: 'deposit'
+    default: 'sale'
   },
   name: {
     type: String,
@@ -40,7 +40,7 @@ const icon = computed(() => {
       icon: mdiCashMinus,
       type: 'danger'
     }
-  } else if (props.type === 'deposit') {
+  } else if (props.type === 'sale') {
     return {
       icon: mdiCashPlus,
       type: 'success'

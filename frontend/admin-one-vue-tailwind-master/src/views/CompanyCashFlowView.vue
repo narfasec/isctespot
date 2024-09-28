@@ -1,5 +1,5 @@
 <script setup>
-import { onBeforeMount, onMounted, computed, ref, watch } from 'vue'
+import { onBeforeMount, computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { mdiTableBorder, mdiPlus } from '@mdi/js'
 import { useMainStore } from '@/stores/main'
@@ -12,55 +12,80 @@ import TableCompanyCashFlowEmployees from '@/components/TableCompanyCashFlowEmpl
 import * as barChartConfig from '@/components/Charts/barChart.config.js'
 import BarChart from '@/components/Charts/BarChart.vue'
 
-// Access the main store
+// Acessa o store principal
 const mainStore = useMainStore()
 const chartData = ref(null)
 const cashflow = computed(() => mainStore.cashFlow)
 const router = useRouter()
 
-// Fetch cashflow data before mounting the component
+// Função para navegar para nova página de funcionário (exemplo)
+const newEmployee = () => {
+  router.push('/new-employee') // Substitui com a tua rota real
+}
+
+// Busca os dados de cashflow antes de montar o componente
 onBeforeMount(() => {
-  mainStore.getCompanyCashFlow()  // Fetch data from the API
+  console.log('onBeforeMount')
+  mainStore.getCompanyCashFlow()
 })
 
-// Watch for changes in the cashflow and trigger chart generation when data is ready
+// Observa mudanças em cashflow e gera dados do gráfico quando os dados estão prontos
 watch(cashflow, (newCashflow) => {
-  console.log(newCashflow.vat_value)
+  console.log('Cashflow Watch:', newCashflow)
   if (newCashflow && newCashflow.status === 'Ok') {
-    const apiData = {
-      profit: newCashflow.profit,
-      totalEmployeesPayment: newCashflow.totalEmployeesPayment,
-      vat_value: newCashflow.vat_value
+    const apiDataJuly = {
+      profit: newCashflow.July.profit,
+      totalEmployeesPayment: newCashflow.July.totalEmployeesPayment,
+      vat_value: newCashflow.July.vat_value,
+      prodCosts: newCashflow.July.prod_costs
+    }
+    const apiDataAugust = {
+      profit: newCashflow.August.profit,
+      totalEmployeesPayment: newCashflow.August.totalEmployeesPayment,
+      vat_value: newCashflow.August.vat_value,
+      prodCosts: newCashflow.August.prod_costs
+    }
+    const apiDataSeptember = {
+      profit: newCashflow.September.profit,
+      totalEmployeesPayment: newCashflow.September.totalEmployeesPayment,
+      vat_value: newCashflow.September.vat_value,
+      prodCosts: newCashflow.August.prod_costs
     }
 
-    // Repeat the same value for 3 months
+    // Valores para três meses
     const dataForThreeMonths = [
-      apiData.profit,
-      apiData.profit,
-      apiData.profit
+      apiDataJuly.profit,
+      apiDataAugust.profit,
+      apiDataSeptember.profit
     ]
 
     const employeePaymentsForThreeMonths = [
-      apiData.totalEmployeesPayment,
-      apiData.totalEmployeesPayment,
-      apiData.totalEmployeesPayment
+      apiDataJuly.totalEmployeesPayment,
+      apiDataAugust.totalEmployeesPayment,
+      apiDataSeptember.totalEmployeesPayment
     ]
 
     const vatForThreeMonths = [
-      parseInt(apiData.vat_value),
-      parseInt(apiData.vat_value),
-      parseInt(apiData.vat_value)
+      parseInt(apiDataJuly.vat_value),
+      parseInt(apiDataAugust.vat_value),
+      parseInt(apiDataSeptember.vat_value)
     ]
 
-    const subscription = [
+    const subscription = [ 
       500,
       500,
       500
     ]
+
+    const prodCosts = [
+      apiDataJuly.prodCosts,
+      apiDataAugust.prodCosts,
+      apiDataSeptember.prodCosts      
+    ]
     
-    // Generate chart data
+    // Gera os dados do gráfico
     chartData.value = barChartConfig.generateBarChartData({
-      labels: ['Month 1', 'Month 2', 'Month 3'],  // X-axis labels for months
+      labels: ['July', 'August', 'September'],  // Labels para os meses
       datasets: [
         {
           label: 'Profit',
@@ -89,11 +114,18 @@ watch(cashflow, (newCashflow) => {
           backgroundColor: 'rgba(255, 159, 64, 0.2)',
           borderColor: 'rgba(255, 159, 64, 1)',
           borderWidth: 1
+        },
+        {
+          label: 'Production costs',
+          data: prodCosts,
+          backgroundColor: 'rgba(255, 159, 64, 0.2)',
+          borderColor: 'rgba(255, 159, 64, 1)',
+          borderWidth: 1
         }
       ]
     })
   }
-}, { immediate: true }) // Watcher will run immediately when cashflow is available
+}, { immediate: true }) // O watcher executa imediatamente quando cashflow está disponível
 
 </script>
 
@@ -116,7 +148,7 @@ watch(cashflow, (newCashflow) => {
       <div class="grid grid-cols-1 gap-6 mb-6">
         <CardBox>
           <div class="p-6">
-            <h3 class="text-lg font-semibold">Profit</h3>
+            <h3 class="text-lg font-semibold">Current Balance</h3>
             <p class="text-2xl font-bold text-green-600">+{{ cashflow.profit || 0 | currency }} $</p>
           </div>
         </CardBox>
@@ -125,15 +157,46 @@ watch(cashflow, (newCashflow) => {
       <div class="grid grid-cols-1 gap-6">
         <CardBox class="mb-6">
           <div v-if="chartData">
-            <bar-chart :data="chartData" class="h-96" />
+            <BarChart :data="chartData" class="h-96" />
           </div>
         </CardBox>
       </div>
 
+      <!-- Seção de Julho -->
       <div class="mt-6">
-        <h3 class="text-lg font-semibold mb-4">Employees</h3>
+        <h3 class="text-lg font-semibold mb-4">July</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <CardBox v-for="(employee, index) in cashflow.employees || []" :key="index">
+          <CardBox v-for="(employee, index) in cashflow.July?.employees || []" :key="index">
+            <div class="p-6">
+              <h4 class="font-bold">{{ employee.Username }}</h4>
+              <p>Total Sales: {{ employee.TotalSales }}</p>
+              <p>Total Commission: {{ employee.TotalCommission }}</p>
+              <p>Commission Percentage: {{ employee.CommissionPercentage }}%</p>
+            </div>
+          </CardBox>
+        </div>
+      </div>
+
+      <!-- Seção de Agosto -->
+      <div class="mt-6">
+        <h3 class="text-lg font-semibold mb-4">August</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <CardBox v-for="(employee, index) in cashflow.August?.employees || []" :key="index">
+            <div class="p-6">
+              <h4 class="font-bold">{{ employee.Username }}</h4>
+              <p>Total Sales: {{ employee.TotalSales }}</p>
+              <p>Total Commission: {{ employee.TotalCommission }}</p>
+              <p>Commission Percentage: {{ employee.CommissionPercentage }}%</p>
+            </div>
+          </CardBox>
+        </div>
+      </div>
+
+      <!-- Seção de Setembro -->
+      <div class="mt-6">
+        <h3 class="text-lg font-semibold mb-4">September</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <CardBox v-for="(employee, index) in cashflow.September?.employees || []" :key="index">
             <div class="p-6">
               <h4 class="font-bold">{{ employee.Username }}</h4>
               <p>Total Sales: {{ employee.TotalSales }}</p>

@@ -3,7 +3,8 @@ export const chartColors = {
     default: {
       profit: '#00D1B2', // Green for profit
       totalEmployeesPayment: '#209CEE', // Blue for employees' payment
-      vat: '#FF3860' // Red for VAT
+      vat: '#FF3860', // Red for VAT
+      prodCosts: '#FF3860'
     }
   }
   

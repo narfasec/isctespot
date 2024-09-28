@@ -152,14 +152,11 @@ export const useMainStore = defineStore('main', () => {
       .post(url, cashFlowPayload)
       .then((r) => {
         this.cashFlow = r.data
-        console.log(r.data)
-        console.log('fftcvhgj')
       })
       .catch((error) => {
         alert(error.message);
     });
-    
-    
+
   }
 
   function deleteEmployee(employee_id){

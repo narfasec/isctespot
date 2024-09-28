@@ -15,7 +15,7 @@ def list_clients():
         return jsonify({'status': 'Unauthorised'}), 403
     results = dbc.execute_query(query='get_company_sales', args=dict_data['comp_id'])
     print(results)
-    pcf = ProcessCashFlow(dict_data['comp_id'], 'PT')
+    pcf = ProcessCashFlow(dict_data['comp_id'], 'PT', month=7) ### in this case we don't cate about the month, let's give one value just to simplify
     revenue = pcf.revenue
     ps = ProcessSales(results, dict_data['user_id'])
     ps.get_3_most_recent_sales()
@@ -72,15 +72,47 @@ def cash_flow():
     dict_data = request.get_json()
     if dict_data['token'] != current_app.config['ADMIN_AUTH_TOKEN']:
         return jsonify({'status': 'Unauthorised'}), 403
-    pcf = ProcessCashFlow(country_code=dict_data['country_code'], company_id=dict_data['comp_id'])
+    
+    #### To Simplify, we will only use 3 fixed months of sales ####
+    pcf7 = ProcessCashFlow(country_code=dict_data['country_code'], company_id=dict_data['comp_id'], month=7)
+    pcf8 = ProcessCashFlow(country_code=dict_data['country_code'], company_id=dict_data['comp_id'], month=8)
+    pcf9 = ProcessCashFlow(country_code=dict_data['country_code'], company_id=dict_data['comp_id'], month=9)
+    #########################################################
+    
     return jsonify(
         {
-            'status': 'Ok',
-            'revenue': pcf.revenue,
-            'profit': pcf.profit,
-            'employees': pcf.employees,
-            'vat': pcf.vat,
-            'vat_value': pcf.vat_value,
-            'totalEmployeesPayment': pcf.total_payment
+        'profit': pcf7.profit + pcf8.profit + pcf9.profit,
+        'status': 'Ok',
+        'July':
+            {
+                'revenue': pcf7.month_revenue,
+                'prod_costs': pcf7.month_prod_costs,
+                'profit': pcf7.profit,
+                'employees': pcf7.employees,
+                'vat': pcf7.vat,
+                'vat_value': pcf7.vat_value,
+                'totalEmployeesPayment': pcf7.total_payment
+            },
+        'August':
+            {
+                'revenue': pcf8.revenue,
+                'prod_costs': pcf8.month_prod_costs,
+                'profit': pcf8.profit,
+                'employees': pcf8.employees,
+                'vat': pcf8.vat,
+                'vat_value': pcf8.vat_value,
+                'totalEmployeesPayment': pcf8.total_payment
+            },
+        'September':
+            {
+                'revenue': pcf9.revenue,
+                'prod_costs': pcf9.month_prod_costs,
+                'profit': pcf9.profit,
+                'employees': pcf9.employees,
+                'vat': pcf9.vat,
+                'vat_value': pcf9.vat_value,
+                'totalEmployeesPayment': pcf9.total_payment
+            }
         }
+            
     ), 200

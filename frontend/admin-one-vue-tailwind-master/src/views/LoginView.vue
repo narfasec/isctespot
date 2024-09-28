@@ -40,8 +40,8 @@ const submit = () => {
       alert(error.message);
   });
 }
-</script>
 
+</script>
 <template>
   <LayoutGuest>
     <SectionFullScreen v-slot="{ cardClass }" bg="purplePink">

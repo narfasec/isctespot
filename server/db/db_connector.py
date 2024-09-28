@@ -1,5 +1,4 @@
 import mariadb
-import sys
 class DBConnector:
 
     def __init__(self):
@@ -10,6 +9,7 @@ class DBConnector:
         self.port = 3306
 
     def connect(self):
+        ''' Connect to database mariadb'''
         try:
             connection = mariadb.connect(
                 user=self.user,
@@ -26,35 +26,36 @@ class DBConnector:
     def execute_query(self, query, args=None):
         ''' Execute queries by query name
             query:
-                Auth:
-                    READ
-                        'get_user_by_name'          args:username       |       return: user id if exits if not, return false
-                        'get_user_password'         args:user_id        |       return: password id if exits if not, return false
-                        'get_user_by_id'            args:user_id        |       return: all parameters
-                        'product             args:user_id        |       return: list of sales by the user
-                        'get_clients_list'          args:company_id     |       return: list of clients
-                        'get_employees_list'        args:company_id     |       return: list of employees
-                        'get_user_admin'            args:user_id        |       return: is_admin value (True or False)
-                        'get_user_comp_id'          args:user_id        |       return: comp_id
-                        'get_products_list'         args:comp_id        |       return: list of products
-                        'get_company_revenue'       args:comp_id        |       return: revenue
-                        'get_last_3_sales'          args:user_id        |       return: list of last_3_sales
-                    CREATE
-                        'create_user_employee'      args: {username, email, company_id}
-                        'create_user_admin'         args: {username, password, email}
-                        'create_company'            args: {company_name, n_employees}
-                        'create_client'             args: {first_name, last_name, email, phone_number, address, city, country, company_id}
-                        'create_sale'               args: {client_id, user_id, product, price, quantity}
-                    UPDATE
-                        'update_user_password'      args: {user_id, new_password}
-                        'update_user_comp_id'       args: {user_id, comp_id}
-                        'update_products_by_comp_id args: {file, comp_id}
-                        'update_company_revenue'    args: comp_id
-                    DELETE
-                        'delete_users_by_comp_id'   args: {user_id, company_id}
-                        'delete_user_by_id'         args: user_id
-                        'delete_company_by_id'      args: company_id
-                        'delete_client_by_id'       args: client_id
+                READ
+                    'get_user_by_name'          args:username       |       return: user id if exits if not, return false
+                    'get_user_password'         args:user_id        |       return: password id if exits if not, return false
+                    'get_user_by_id'            args:user_id        |       return: all parameters
+                    'get_user_sales'            args:user_id        |       return: list of sales by the user
+                    'get_clients_list'          args:company_id     |       return: list of clients
+                    'get_employees_list'        args:company_id     |       return: list of employees
+                    'get_user_admin'            args:user_id        |       return: is_admin value (True or False)
+                    'get_user_comp_id'          args:user_id        |       return: comp_id
+                    'get_products_list'         args:comp_id        |       return: list of products
+                    'get_company_revenue'       args:comp_id        |       return: revenue
+                    'get_last_3_sales'          args:user_id        |       return: list of last_3_sales
+                    'get_sales_month_comp_id'   args:month,comp_id  |       return: list of sales of selected month
+                    'get_costs_sales_month'     args:month,comp_id  |       return: production costs and sales revenue for given month
+                CREATE
+                    'create_user_employee'      args: {username, email, company_id}
+                    'create_user_admin'         args: {username, password, email}
+                    'create_company'            args: {company_name, n_employees}
+                    'create_client'             args: {first_name, last_name, email, phone_number, address, city, country, company_id}
+                    'create_sale'               args: {client_id, user_id, product, price, quantity}
+                UPDATE
+                    'update_user_password'      args: {user_id, new_password}
+                    'update_user_comp_id'       args: {user_id, comp_id}
+                    'update_products_by_comp_id args: {file, comp_id}
+                    'update_company_revenue'    args: comp_id
+                DELETE
+                    'delete_users_by_comp_id'   args: {user_id, company_id}
+                    'delete_user_by_id'         args: user_id
+                    'delete_company_by_id'      args: company_id
+                    'delete_client_by_id'       args: client_id
         '''
         print(f'DB query selceted: {query}, args: {args}')
         connection = self.connect()
@@ -225,8 +226,10 @@ class DBConnector:
                             FROM Users u
                             LEFT JOIN Sales s ON u.UserID = s.UserID
                             LEFT JOIN Products p ON s.ProductID = p.ProductID
-                            WHERE u.CompanyID = {args} 
+                            WHERE u.CompanyID = {args['comp_id']} 
                             AND p.CompanyID = u.CompanyID
+                            AND MONTH(s.SaleDate) = {args['month']}
+                            AND YEAR(s.SaleDate) = 2024
                             GROUP BY u.UserID, u.CommissionPercentage
                     """
                 )
@@ -279,6 +282,59 @@ class DBConnector:
                 else:
                     return False
             
+            elif query == 'get_sales_month_comp_id':
+                cursor.execute(
+                    """
+                    SELECT 
+                        Sales.SaleID,
+                        Sales.UserID,
+                        Sales.ClientID,
+                        Sales.ProductID,
+                        Sales.Quantity,
+                        Sales.SaleDate
+                    FROM 
+                        Sales
+                    JOIN 
+                        Users ON Sales.UserID = Users.UserID
+                    WHERE 
+                        Users.CompanyID = ?
+                        AND MONTH(Sales.SaleDate) = ?
+                        AND YEAR(Sales.SaleDate) = 2024;
+                    """,
+                    (args['comp_id'], args['month'])
+                )
+                result = cursor.fetchall()
+                print(result)
+                if isinstance(result, list):
+                    return result
+                else:
+                    return False
+
+            elif query == 'get_costs_sales_month':
+                cursor.execute(
+                    f"""
+                    SELECT 
+                        SUM(Products.SellingPrice * Sales.Quantity) AS TotalSellingPrice,
+                        SUM(Products.FactoryPrice * Sales.Quantity) AS TotalFactoryPrice
+                    FROM 
+                        Sales
+                    JOIN 
+                        Products ON Sales.ProductID = Products.ProductID
+                    WHERE 
+                        Products.CompanyID = {args['comp_id']}
+                        AND MONTH(Sales.SaleDate) = {args['month']}
+                        AND YEAR(Sales.SaleDate) = 2024;
+                    """
+                )
+                result = cursor.fetchone()
+                print(result)
+                try:
+                    if isinstance(result, tuple):
+                        return result[0]
+                    else:
+                        return result
+                except TypeError:
+                    return False
             elif query == 'create_user_employee':
                 cursor.execute(
                     "INSERT INTO Users (Username, PasswordHash, Email, CompanyID, CommissionPercentage, CreatedAt) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)",
