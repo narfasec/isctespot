@@ -20,13 +20,7 @@ const router = useRouter()
 <template>
   <LayoutGuest>
     <!-- Top Navigation Bar -->
-    <!-- <nav class="navbar">
-      <ul class="nav-links">
-        <li><a href="#about">About</a></li>
-        <li><a href="#pricing">Pricing</a></li>
-        <li><a href="#start">Start</a></li>
-      </ul>
-    </nav> -->
+
     <div :class="gradientBgPurplePink" class="flex min-h-screen items-center justify-center">
       <SectionMain>
         <h1 class="text-4xl md:text-5xl text-center text-white font-bold mt-12 mb-3 lg:mt-0">

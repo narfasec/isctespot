@@ -105,7 +105,6 @@ const deleteClient = async (client) => {
   <table>
     <thead>
       <tr>
-        <th v-if="checkable" />
         <th>Name</th>
         <th>Email</th>
         <th>Address</th>
@@ -116,7 +115,6 @@ const deleteClient = async (client) => {
     </thead>
     <tbody>
       <tr v-for="client in items" :key="client['ClientID']">
-        <TableCheckboxCell v-if="checkable" @checked="checked($event, client)"/>
         <td data-label="Name">
           {{ client['FirstName'] }} {{ client['LastName'] }} 
         </td>
@@ -131,11 +129,6 @@ const deleteClient = async (client) => {
         </td>
         <td data-label="Country">
           {{ client['Country'] }}
-        </td>
-        <td class="before:hidden lg:w-1 whitespace-nowrap">
-          <BaseButtons type="justify-start lg:justify-end" no-wrap>
-            <BaseButton color="info" :icon="mdiEye" small @click="isModalActive = true" />
-          </BaseButtons>
         </td>
       </tr>
     </tbody>

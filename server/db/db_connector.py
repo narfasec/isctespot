@@ -31,13 +31,14 @@ class DBConnector:
                         'get_user_by_name'          args:username       |       return: user id if exits if not, return false
                         'get_user_password'         args:user_id        |       return: password id if exits if not, return false
                         'get_user_by_id'            args:user_id        |       return: all parameters
-                        'get_user_sales             args:user_id        |       return: list of sales by the user
+                        'product             args:user_id        |       return: list of sales by the user
                         'get_clients_list'          args:company_id     |       return: list of clients
                         'get_employees_list'        args:company_id     |       return: list of employees
                         'get_user_admin'            args:user_id        |       return: is_admin value (True or False)
                         'get_user_comp_id'          args:user_id        |       return: comp_id
                         'get_products_list'         args:comp_id        |       return: list of products
                         'get_company_revenue'       args:comp_id        |       return: revenue
+                        'get_last_3_sales'          args:comp_id        |       return: list of last_3_sales
                     CREATE
                         'create_user_employee'      args: {username, email, company_id}
                         'create_user_admin'         args: {username, password, email}
@@ -126,9 +127,11 @@ class DBConnector:
             elif query == 'get_company_sales':
                 cursor.execute(
                     f"""
-                    SELECT Sales.SaleID, Sales.UserID, Sales.ClientID, Sales.ProductID, Sales.Quantity, Sales.SaleDate
+                    SELECT Sales.SaleID, Products.ProductName, Users.Username, Clients.FirstName, Clients.FirstName, Products.SellingPrice, Sales.Quantity, Sales.SaleDate
                     FROM Sales
                     JOIN Clients ON Sales.ClientID = Clients.ClientID
+                    JOIN Users ON Sales.UserID = Users.UserID
+                    JOIN Products ON Sales.ProductID = Products.ProductID
                     WHERE Clients.CompanyID = {args};
                     """
                 )
@@ -141,7 +144,24 @@ class DBConnector:
             elif query == 'get_user_sales':
                 cursor.execute(
                     f"""
-                    SELECT * FROM Sales WHERE UserID = {args};
+                    SELECT 
+                        S.SaleID,
+                        U.UserName,    
+                        C.FirstName,   
+                        P.ProductName,
+                        P.SellingPrice,
+                        S.Quantity,
+                        S.SaleDate
+                    FROM 
+                        Sales S
+                    JOIN 
+                        Users U ON S.UserID = U.UserID       -- Join the Users table to get UserName
+                    JOIN 
+                        Clients C ON S.ClientID = C.ClientID -- Join the Clients table to get ClientName
+                    JOIN 
+                        Products P ON S.ProductID = P.ProductID -- Join the Products table to get ProductName
+                    WHERE 
+                        S.UserID = {args};
                     """
                 )
                 result = cursor.fetchall()
@@ -178,7 +198,7 @@ class DBConnector:
                     return result['CompanyID']
 
             elif query == 'get_products_list':
-                cursor.execute(f"SELECT ProductID, ProductName FROM Products WHERE CompanyID = {args}")
+                cursor.execute(f"SELECT ProductID, ProductName, SellingPrice FROM Products WHERE CompanyID = {args}")
                 result = cursor.fetchall()
                 if isinstance(result, list):
                     return result
@@ -195,17 +215,19 @@ class DBConnector:
             elif query == 'get_employees_return':
                 cursor.execute(
                     f"""
-                    SELECT 
-                        u.UserID,
-                        u.Username,
-                        u.CommissionPercentage,
-                        COUNT(s.SaleID) AS total_sales,
-                        SUM(s.Price * s.Quantity) AS total_sales_amount,
-                        (SUM(s.Price * s.Quantity) * (u.CommissionPercentage / 100)) AS total_commission
-                    FROM Users u
-                    LEFT JOIN Sales s ON u.UserID = s.UserID
-                    WHERE u.CompanyID = {args}
-                    GROUP BY u.UserID, u.CommissionPercentage
+                            SELECT 
+                                u.UserID,
+                                u.Username,
+                                u.CommissionPercentage,
+                                COUNT(s.SaleID) AS total_sales,
+                                SUM(s.Quantity * p.SellingPrice) AS total_sales_amount,
+                                (SUM(s.Quantity * p.SellingPrice) * (u.CommissionPercentage / 100)) AS total_commission
+                            FROM Users u
+                            LEFT JOIN Sales s ON u.UserID = s.UserID
+                            LEFT JOIN Products p ON s.ProductID = p.ProductID
+                            WHERE u.CompanyID = {args} 
+                            AND p.CompanyID = u.CompanyID
+                            GROUP BY u.UserID, u.CommissionPercentage
                     """
                 )
                 result = cursor.fetchall()
@@ -223,6 +245,39 @@ class DBConnector:
                     })
 
                 return employee_sales_data
+            
+            elif query == 'get_last_3_sales':
+                cursor.execute(
+                    f"""
+                    SELECT 
+                        S.SaleID,
+                        U.UserName,    
+                        C.FirstName,   
+                        P.ProductName,
+                        P.SellingPrice,
+                        S.Quantity,
+                        S.SaleDate
+                    FROM 
+                        Sales S
+                     JOIN
+                        Users U ON S.UserID = U.UserID       -- Join the Users table to get UserName
+                    JOIN 
+                        Clients C ON S.ClientID = C.ClientID -- Join the Clients table to get ClientName
+                    JOIN 
+                        Products P ON S.ProductID = P.ProductID -- Join the Products table to get ProductName
+                    WHERE 
+                        S.UserID = {args}
+                  	ORDER BY
+                        S.SaleDate DESC
+                   LIMIT 3;
+                    """
+                )
+                result = cursor.fetchall()
+                print(result)
+                if isinstance(result, list):
+                    return result
+                else:
+                    return False
 
             elif query == 'create_user_employee':
                 cursor.execute(
@@ -349,13 +404,15 @@ class DBConnector:
 
                 cursor.execute(
                     f"""
-                    SELECT SUM(s.Price) AS total_sales
+                    SELECT SUM(s.Quantity * p.SellingPrice) AS total_sales
                     FROM sales s
+                    JOIN products p ON s.ProductID = p.ProductID
                     JOIN users u ON s.UserID = u.UserID
                     WHERE u.CompanyID = {args};
                     """
                 )
                 result = cursor.fetchone()
+                print(result)
                 if isinstance(result, dict):
                     result = result['total_sales']
                 

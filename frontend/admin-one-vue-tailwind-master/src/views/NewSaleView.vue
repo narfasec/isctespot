@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref, computed, watchEffect, watch } from 'vue'
+import { reactive, ref, computed, watchEffect, watch, onBeforeMount} from 'vue'
 import { mdiBallotOutline, mdiAccount, mdiMail, mdiGithub, mdiFlagOutline, mdiCancel, mdiCross, mdiClose } from '@mdi/js'
 import SectionMain from '@/components/SectionMain.vue'
 import CardBox from '@/components/CardBox.vue'
@@ -20,16 +20,11 @@ import { useMainStore } from '@/stores/main'
 
 const router = useRouter()
 const mainStore = useMainStore()
+const items = computed(() => mainStore.products)
 
-// Temporary data TODO remove this, fix issue
-const products = [
-  { ProductID: 1, ProductName: 'Laptop', Price: 1100 },
-  { ProductID: 2, ProductName: 'GPU Disk', Price: 900 },
-  { ProductID: 3, ProductName: 'Smartphone', Price: 800 },
-  { ProductID: 4, ProductName: 'Mechanical Keyboard', Price: 150 },
-  { ProductID: 5, ProductName: '4K Monitor', Price: 400 },
-  { ProductID: 6, ProductName: 'Wireless Mouse', Price: 50 }
-];
+onBeforeMount(() => {
+  mainStore.getCompanyProducts()
+})
 
 watchEffect(() => {
   if (!mainStore._clients || mainStore._clients.length === 0) {
@@ -46,7 +41,9 @@ const selectClientOptions = computed(() => {
 
 // TODO backend, fazer uma tabela Products e um get products by id, usar o mainStore aqui
 const selectProductOptions = computed(() => {
-  return products.map((product, index) => ({
+  console.log('Products')
+  console.log(items.value)
+  return items.value.map((product, index) => ({
     id: index,
     label: `${product['ProductName']}`
   }))
@@ -76,9 +73,8 @@ const submit = () => {
 
   const newSalePayload = {
     client_id: form.clientId['id'],
-    product: form.product['label'],
+    product_id: form.product['id'],
     quantity: form.quantity,
-    price: form.price,
     token: localStorage.getItem('token'),
     user_id: localStorage.getItem('userId'),
     comp_id: localStorage.getItem('companyId')
@@ -132,7 +128,7 @@ function getProductPrice(productName) {
     return null
   }
 
-  const product = products.find(product => 
+  const product = items.value.find(product => 
     product.ProductName === productName
   );
 
@@ -165,12 +161,6 @@ function getProductPrice(productName) {
         </FormField>
 
         <FormField label="Price and quantity" help="Insert price and quantity">
-          <FormControl
-            v-model="form.price"
-            :icon="mdiIdCash"
-            name="price"
-            size="small"
-          />
           <FormControl
             v-model="form.quantity"
             :icon="mdiIdCard"

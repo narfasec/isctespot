@@ -11,17 +11,18 @@ const props = defineProps({
     type: Number,
     required: true
   },
-  date: {
+  product: {
     type: String,
     required: true
   },
-  business: {
+  quantity: {
     type: String,
     required: true
   },
   type: {
     type: String,
-    required: true
+    required: true,
+    default: 'deposit'
   },
   name: {
     type: String,
@@ -66,7 +67,7 @@ const icon = computed(() => {
         <div class="text-center space-y-1 md:text-left md:mr-6">
           <h4 class="text-xl">${{ amount }}</h4>
           <p class="text-gray-500 dark:text-slate-400">
-            <b>{{ date }}</b> via {{ business }}
+            <b>{{ product }}</b> x {{ quantity }}
           </p>
         </div>
       </BaseLevel>

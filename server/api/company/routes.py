@@ -2,6 +2,7 @@ from flask import Flask, Blueprint, request, jsonify, current_app
 from db.db_connector import DBConnector
 from services.process_file import ProcessFile
 from services.process_cash_flow import ProcessCashFlow
+from services.process_sales     import ProcessSales
 import os
 
 company = Blueprint('company', __name__)
@@ -13,10 +14,14 @@ def list_clients():
     dict_data = request.get_json()
     if dict_data['token'] != current_app.config['ADMIN_AUTH_TOKEN']:
         return jsonify({'status': 'Unauthorised'}), 403
-    results = dbc.execute_query(query='get_company_sales', args=dict_data['company_id'])
+    results = dbc.execute_query(query='get_company_sales', args=dict_data['comp_id'])
     print(results)
+    pcf = ProcessCashFlow(dict_data['comp_id'], 'PT')
+    revenue = pcf.revenue
+    ps = ProcessSales(results, dict_data['comp_id'])
+    ps.get_3_most_recent_sales()
     if isinstance(results, list):
-        return jsonify({'status': 'Ok', 'sales': results}), 200
+        return jsonify({'status': 'Ok', 'last_3_sales': ps.last_3_sales, 'revenue': revenue, 'sales': results}), 200
     return jsonify({'status': 'Bad request'}), 403
 
 @company.route('/employees', methods=['GET', 'POST'])

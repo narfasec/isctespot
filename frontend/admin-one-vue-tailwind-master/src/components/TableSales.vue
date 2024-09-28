@@ -121,24 +121,19 @@ const deleteClient = async (client) => {
           {{ client['ProductName'] }} 
         </td>
         <td data-label="Seller">
-          {{ client['UserID'] }}
+          {{ client['Username'] }}
         </td>
         <td data-label="Client">
-          {{ client['ClientID'] }}
+          {{ client['FirstName'] }}
         </td>
         <td data-label="Quantity">
           {{ client['Quantity'] }}
         </td>
-        <td data-label="Price">
-          {{ client['Price'] }}
+        <td data-label="Price $"> 
+          {{ client['SellingPrice'] }}
         </td>
         <td data-label="Sale Date">
-          {{ client['Sale Date'] }}
-        </td>
-        <td class="before:hidden lg:w-1 whitespace-nowrap">
-          <BaseButtons type="justify-start lg:justify-end" no-wrap>
-            <BaseButton color="info" :icon="mdiEye" small @click="isModalActive = true" />
-          </BaseButtons>
+          {{ client['SaleDate'] }}
         </td>
       </tr>
     </tbody>

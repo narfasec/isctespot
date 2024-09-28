@@ -22,6 +22,7 @@ export const useMainStore = defineStore('main', () => {
   const products = ref([])
   const totalRevenue = ref([])
   const cashFlow = ref([])
+  const last3Sales = ref([])
   // const userName = ref()
 
   function setUser(payload) {
@@ -76,12 +77,14 @@ export const useMainStore = defineStore('main', () => {
     const adminOverviewPayload = {
       user_id: Number(localStorage.getItem('userId')),
       token: localStorage.getItem('token'),
-      company_id: Number(localStorage.getItem('companyId'))
+      comp_id: Number(localStorage.getItem('companyId'))
     };
     axios
       .post(url, adminOverviewPayload)
       .then((r) => {
         this.sales = r.data.sales
+        this.totalRevenue = r.data.revenue
+        this.last3Sales = r.data.last_3_sales
       })
       .catch((error) => {
         alert(error.message);
@@ -177,10 +180,11 @@ export const useMainStore = defineStore('main', () => {
 
   function calculateSalesRevenue() {
     let totalRevenue = 0;
-  
+    console.log('Sales')
+    console.log(this.sales)
     // Iterate through each sale and calculate revenue
     this.sales.forEach((sale) => {
-      const revenue = sale.Price * sale.Quantity;
+      const revenue = sale.SellingPrice * sale.Quantity;
       totalRevenue += revenue;
     });
   

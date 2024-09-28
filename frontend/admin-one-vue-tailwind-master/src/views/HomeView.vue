@@ -53,6 +53,9 @@ const numberOfClients = computed(() => mainStore._clients.length)
 const numberOfSales = computed(() => mainStore.sales.length)
 const totalRevenue = computed(() => mainStore.totalRevenue)
 
+function sale_value(price, quantity){
+  return price * quantity
+}
 </script>
 
 <template>
@@ -90,36 +93,30 @@ const totalRevenue = computed(() => mainStore.totalRevenue)
         />
       </div>
 
-      <SectionTitleLineWithButton :icon="mdiChartPie" title="Trends overview">
+      <SectionTitleLineWithButton :icon="mdiChartPie" title="Last sales">
         <BaseButton :icon="mdiReload" color="whiteDark" @click="fillChartData" />
       </SectionTitleLineWithButton>
-      <CardBox class="mb-6">
-        <div v-if="chartData">
-          <line-chart :data="chartData" class="h-96" />
-        </div>
-      </CardBox>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div class="flex flex-col justify-between">
           <CardBoxTransaction
-            v-for="(transaction, index) in transactionBarItems"
+            v-for="(sales, index) in mainStore.last3Sales"
             :key="index"
-            :amount="transaction.amount"
-            :date="transaction.date"
-            :business="transaction.business"
-            :type="transaction.type"
-            :name="transaction.name"
-            :account="transaction.account"
+            :amount="sale_value(sales.SellingPrice, sales.Quantity)"
+            :product="sales.ProductName"
+            :quantity="sales.Quantity"
+            :name="sales.Username"
+            :account="sales.account"
           />
         </div>
         <div class="flex flex-col justify-between">
           <CardBoxClient
-            v-for="client in clientBarItems"
-            :key="client.id"
-            :name="client.name"
-            :login="client.login"
-            :date="client.created"
-            :progress="client.progress"
+            v-for="sales in mainStore.last3Sales"
+            :key="sales.SaleID"
+            :name="sales.FirstName"
+            :login="sales.UserName" 
+            :date="sales.SaleDate"
+            :progress=50
           />
         </div>
       </div>

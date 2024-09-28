@@ -252,7 +252,7 @@ analytics_url = f'{base_url}/analytics'
 analytics_payload = {
     'user_id': 1,
     'token': ADMIN_AUTH_TOKEN,
-    'company_id': 1
+    'comp_id': 1
 }
 analytics_response = requests.get(analytics_url, json=analytics_payload)
 analytics_data = analytics_response.json()
@@ -261,6 +261,21 @@ if analytics_data['status'] == 'Ok':
     test_output_status('pass', 'Company analytics success')
 else:
     test_output_status('fail', 'Company analytics failed')
+
+# Admin calculates cashflow
+cash_flow_url = f'{base_url}/cash-flow'
+cash_flow_payload = {
+    'comp_id': 1,
+    'country_code': 'PT',
+    'token': ADMIN_AUTH_TOKEN
+}
+
+cash_flow_response = requests.post(cash_flow_url, json=cash_flow_payload)
+cash_flow_data = cash_flow_response.json()
+if cash_flow_data['status'] == 'Ok':
+    test_output_status('pass', 'Cash flow calculated')
+else:
+    test_output_status('fail', 'Cash flow failed')
 
 # User overview
 test_output_status('info', 'Testing user overview')

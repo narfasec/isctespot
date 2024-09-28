@@ -23,7 +23,7 @@ onBeforeMount(() => {
 // Trigger file input to select a file
 const uploadProducts = () => {
   fileInput.value.click()
-}
+} 
 
 // Handle file selection and upload
 const handleFileChange = async (event) => {

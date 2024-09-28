@@ -8,7 +8,7 @@ data = [
         "LastLogin": "2024-08-21 09:32:45",
         "CompanyID": 1,
         "ResetPassword": 0,
-        "CommissionPercentage": 5,
+        "CommissionPercentage": 15,
         "LastLogout": "2024-08-21 17:45:11",
         "isActive": 1,
         "IsAdmin": 1
