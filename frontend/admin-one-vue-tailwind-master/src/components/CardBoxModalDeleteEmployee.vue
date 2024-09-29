@@ -7,6 +7,7 @@ import CardBox from '@/components/CardBox.vue'
 import OverlayLayer from '@/components/OverlayLayer.vue'
 import CardBoxComponentTitle from '@/components/CardBoxComponentTitle.vue'
 import { useMainStore } from '@/stores/main'
+import { useRouter } from 'vue-router'
 
 const props = defineProps({
   title: {
@@ -34,6 +35,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'cancel', 'confirm'])
 const mainStore = useMainStore()
+const router = useRouter()
 const value = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value)
@@ -43,6 +45,7 @@ const confirmCancel = (mode) => {
   value.value = false
   if(mode === 'confirm'){
     mainStore.deleteEmployee(props.item)
+    router.push('/company/employees')
   }
   emit(mode)
 }

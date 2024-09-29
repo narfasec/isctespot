@@ -15,7 +15,6 @@ def list_clients():
     if dict_data['token'] != current_app.config['ADMIN_AUTH_TOKEN']:
         return jsonify({'status': 'Unauthorised'}), 403
     results = dbc.execute_query(query='get_company_sales', args=dict_data['comp_id'])
-    print(results)
     pcf = ProcessCashFlow(dict_data['comp_id'], 'PT', month=7) ### in this case we don't cate about the month, let's give one value just to simplify
     revenue = pcf.revenue
     ps = ProcessSales(results, dict_data['user_id'])
@@ -52,13 +51,11 @@ def list_products():
 def invoice():
     ''' List products for given company '''
     filename = request.args.get('filename')
-    print(filename)
     # Construct the full file path
-    dir = os.path.join(os.path.dirname(__file__), 'invoices')
-    file_path = os.path.join(dir, filename)
+    _dir = os.path.join(os.path.dirname(__file__), 'invoices')
+    file_path = os.path.join(_dir, filename)
 
     # Check if the file exists
-    print(f'Exists - {os.path}')
     if os.path.exists(file_path):
         try:
             # Send the file to the client with the proper mimetype
@@ -68,6 +65,21 @@ def invoice():
     else:
         # If the file doesn't exist, return a 404 error
         abort(404, description="File not found")
+
+@company.route('/seller/update-commission', methods=['GET', 'POST'])
+def update_commission():
+    ''' Update seller commission '''
+    dict_data = request.get_json()
+    token = dict_data['token']
+    print(dict_data)
+    seller_id = dict_data['seller_id']
+    new_commission = dict_data['new_commission']
+    print(token + '======' + current_app.config['ADMIN_AUTH_TOKEN'])
+    if token != current_app.config['ADMIN_AUTH_TOKEN']:
+        return jsonify({'status': 'Unauthorized'}), 403
+    dbc = DBConnector()
+    dbc.execute_query(query='update_seller_commission', args={'seller_id': seller_id, 'new_commission':new_commission})
+    return jsonify({'status': 'Ok','message': 'File successfully uploaded'}), 200
 
 @company.route('/update_products', methods=['POST'])
 def upload_excel():

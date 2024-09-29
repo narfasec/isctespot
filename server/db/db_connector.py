@@ -304,7 +304,6 @@ class DBConnector:
                     (args['comp_id'], args['month'])
                 )
                 result = cursor.fetchall()
-                print(result)
                 if isinstance(result, list):
                     return result
                 else:
@@ -434,15 +433,14 @@ class DBConnector:
                 if isinstance(result, tuple):
                     result = result[0]
                 return result
-            
+
             elif query == 'update_products_by_comp_id':
                 cursor.execute(
                     f"""
                     DELETE FROM Products WHERE CompanyID = {args['comp_id']}
                     """
                 )
-                print('Products have been deleted')
-                
+
                 insert_query = """
                     INSERT INTO Products (ProductID, CompanyID, ProductName, FactoryPrice, SellingPrice, CreatedAt)
                     VALUES (?, ?, ?, ?, ?, ?)
@@ -452,10 +450,8 @@ class DBConnector:
                     cursor.execute(insert_query, (row['ProductID'], args['comp_id'], row['ProductName'],row['FactoryPrice'], row['SellingPrice'],  row['CreatedAt']))
                 
                 connection.commit()
-                print(f"Inserted new products for CompanyID {args['comp_id']}")
-                
                 return True
-            
+
             elif query == 'update_company_revenue':
 
                 cursor.execute(
@@ -468,10 +464,9 @@ class DBConnector:
                     """
                 )
                 result = cursor.fetchone()
-                print(result)
                 if isinstance(result, dict):
                     result = result['total_sales']
-                
+
                 cursor.execute(
                     f"""
                     UPDATE Companies
@@ -496,10 +491,41 @@ class DBConnector:
                     """)
                 connection.commit()
                 result = cursor.rowcount
+                return True
+
+            elif query == 'update_seller_commission':
+                value = args['new_commission']
+                user_id = args['seller_id']
+                cursor.execute(
+                    f"""
+                    UPDATE Users
+                    SET CommissionPercentage = {value}
+                    WHERE UserID = {user_id};
+                    """
+                )
+                connection.commit()
+                result = cursor.rowcount
+                print(result)
+                if isinstance(result, tuple):
+                    result = result[0]
+                return result
+
+            elif query == 'delete_sales_by_comp_id':
+                cursor.execute(
+                    f"""
+                    DELETE FROM sales
+                    WHERE UserID IN (
+                        SELECT UserID
+                        FROM users
+                        WHERE CompanyID = {args}
+                    );
+
+                    """)
+                connection.commit()
+                result = cursor.rowcount
                 print('Deleting Sales')
                 print(result)
                 return True
-            
             elif query == 'delete_products_by_comp_id':
                 cursor.execute(f"DELETE FROM Products WHERE CompanyID = {args}")
                 connection.commit()
@@ -521,7 +547,6 @@ class DBConnector:
                     return True
                 else:
                     return False
-
 
             elif query == 'delete_company_by_id':
                 cursor.execute(f"DELETE FROM Companies WHERE CompanyID = ?", (args,))

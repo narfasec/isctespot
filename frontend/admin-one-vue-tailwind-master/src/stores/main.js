@@ -169,7 +169,27 @@ export const useMainStore = defineStore('main', () => {
     axios
       .post(url, employeesPayload)
       .then((r) => {
-        router.push('/employees')
+        alert('Seller deleted');
+      })
+      .catch((error) => {
+        alert(error.message);
+    });
+  }
+
+  function editCommission(sellerId, newCommission){
+    console.log(sellerId)
+    console.log('fodass')
+    const url = "http://localhost:5000/seller/update-commission"
+    const newComissionPayload = {
+      user_id: localStorage.getItem('userId'),
+      token: localStorage.getItem('token'),
+      seller_id: sellerId,
+      new_commission: newCommission
+    };
+    axios
+      .post(url, newComissionPayload)
+      .then((r) => {
+        alert('Commission edited');
       })
       .catch((error) => {
         alert(error.message);
@@ -210,6 +230,7 @@ export const useMainStore = defineStore('main', () => {
     getCompanyProducts,
     getCompanyCashFlow,
     deleteEmployee,
+    editCommission,
     calculateSalesRevenue
   }
 })

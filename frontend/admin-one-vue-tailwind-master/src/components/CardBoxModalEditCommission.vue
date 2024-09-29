@@ -6,7 +6,8 @@ import BaseButtons from '@/components/BaseButtons.vue'
 import CardBox from '@/components/CardBox.vue'
 import OverlayLayer from '@/components/OverlayLayer.vue'
 import CardBoxComponentTitle from '@/components/CardBoxComponentTitle.vue'
-
+import { useMainStore } from '@/stores/main'
+import { useRouter } from 'vue-router'
 const props = defineProps({
   title: {
     type: String,
@@ -24,6 +25,9 @@ const props = defineProps({
     type: String,
     required: true
   },
+  commission: {
+    type: Number,
+  },
   hasCancel: Boolean,
   modelValue: {
     type: [String, Number, Boolean],
@@ -32,7 +36,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'cancel', 'confirm'])
-
+const mainStore = useMainStore()
+const router = useRouter()
 const value = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value)
@@ -40,6 +45,10 @@ const value = computed({
 
 const confirmCancel = (mode) => {
   value.value = false
+  if(mode === 'confirm' && props.commission !== undefined){
+    mainStore.editCommission(props.item, props.commission)
+    router.push('/company/employees')
+  }
   emit(mode)
 }
 
