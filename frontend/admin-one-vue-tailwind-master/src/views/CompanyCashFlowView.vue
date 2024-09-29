@@ -1,14 +1,13 @@
 <script setup>
 import { onBeforeMount, computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { mdiTableBorder, mdiPlus } from '@mdi/js'
+import { mdiTableBorder, mdiArrowDownBoldCircle } from '@mdi/js'
 import { useMainStore } from '@/stores/main'
 import SectionMain from '@/components/SectionMain.vue'
-import CardBox from '@/components/CardBox.vue'
+import axios from 'axios'
 import LayoutAuthenticated from '@/layouts/LayoutAuthenticated.vue'
 import SectionTitleLineWithButton from '@/components/SectionTitleLineWithButton.vue'
 import BaseButton from '@/components/BaseButton.vue'
-import TableCompanyCashFlowEmployees from '@/components/TableCompanyCashFlowEmployees.vue'
 import * as barChartConfig from '@/components/Charts/barChart.config.js'
 import BarChart from '@/components/Charts/BarChart.vue'
 
@@ -18,9 +17,40 @@ const chartData = ref(null)
 const cashflow = computed(() => mainStore.cashFlow)
 const router = useRouter()
 
-// Função para navegar para nova página de funcionário (exemplo)
-const newEmployee = () => {
-  router.push('/new-employee') // Substitui com a tua rota real
+const invoice = (filename) => {
+  filename = 'invoice.pdf'
+  axios({
+    url: `http://localhost:5000/invoice?filename=${filename}`,
+    method: 'GET',
+    responseType: 'blob', // Specify responseType as blob to handle binary data
+  })
+  .then((response) => {
+    // To download the file
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+
+    // Optional: Set the filename for the downloaded file (e.g., `filename` from the response headers or query param)
+    link.setAttribute('download', filename); 
+
+    // Append to the document, click to trigger the download, then remove the link
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Save other response data if necessary (token, user info, etc.)
+    localStorage.setItem('token', response.headers['auth-token']); // Assuming token is sent in headers
+    localStorage.setItem('userId', response.headers['user-id']);
+    localStorage.setItem('isAdmin', response.headers['is-admin']);
+    localStorage.setItem('companyId', response.headers['comp-id']);
+    localStorage.setItem('username', form.login);
+
+    // Redirect to the dashboard
+    router.push('/dashboard');
+  })
+  .catch((error) => {
+    alert(error.message);
+  });
 }
 
 // Busca os dados de cashflow antes de montar o componente
@@ -135,13 +165,13 @@ watch(cashflow, (newCashflow) => {
       <SectionTitleLineWithButton :icon="mdiTableBorder" title="Cash Flow" main>
         <BaseButton
           target="_blank"
-          :icon="mdiPlus"
-          label="Pay Employees"
-          color="success"
+          :icon="mdiArrowDownBoldCircle"
+          label="Invoices"
+          color="info"
           rounded-full
           small
           class="hover:shadow-lg transform hover:scale-105 transition-transform duration-200"
-          @click="newEmployee"
+          @click="invoice"
         />
       </SectionTitleLineWithButton>
 

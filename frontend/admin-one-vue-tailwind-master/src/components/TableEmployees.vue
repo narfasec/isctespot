@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useMainStore } from '@/stores/main'
-import { mdiEye, mdiTrashCan } from '@mdi/js'
+import { mdiPencil, mdiTrashCan } from '@mdi/js'
 import CardBoxModalDeleteEmployee from '@/components/CardBoxModalDeleteEmployee.vue'
 import CardBoxModal from '@/components/CardBoxModal.vue'
 import TableCheckboxCell from '@/components/TableCheckboxCell.vue'
@@ -129,7 +129,7 @@ const deleteEmployee = async (employee) => {
         </td>
         <td class="before:hidden lg:w-1 whitespace-nowrap">
           <BaseButtons type="justify-start lg:justify-end" no-wrap>
-            <BaseButton color="info" :icon="mdiEye" small @click="isModalActive = true" />
+            <BaseButton color="info" :icon="mdiPencil" small @click="isModalActive = true" />
             <BaseButton
               color="danger"
               :icon="mdiTrashCan"

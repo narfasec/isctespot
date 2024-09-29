@@ -1,4 +1,5 @@
-from flask import Flask, Blueprint, request, jsonify, current_app
+import os
+from flask import Flask, Blueprint, request, jsonify, current_app, abort, send_file
 from db.db_connector import DBConnector
 from services.process_file import ProcessFile
 from services.process_cash_flow import ProcessCashFlow
@@ -46,7 +47,28 @@ def list_products():
     if isinstance(results, list):
         return jsonify({'status': 'Ok', 'products': results}), 200
     return jsonify({'status': 'Bad request'}), 403
-    
+
+@company.route('/invoice', methods=['GET', 'POST'])
+def invoice():
+    ''' List products for given company '''
+    filename = request.args.get('filename')
+    print(filename)
+    # Construct the full file path
+    dir = os.path.join(os.path.dirname(__file__), 'invoices')
+    file_path = os.path.join(dir, filename)
+
+    # Check if the file exists
+    print(f'Exists - {os.path}')
+    if os.path.exists(file_path):
+        try:
+            # Send the file to the client with the proper mimetype
+            return send_file(file_path, as_attachment=True)
+        except Exception as e:
+            return str(e), 500
+    else:
+        # If the file doesn't exist, return a 404 error
+        abort(404, description="File not found")
+
 @company.route('/update_products', methods=['POST'])
 def upload_excel():
     ''' Update company products from csv or xlsx '''
