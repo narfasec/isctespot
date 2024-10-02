@@ -2,7 +2,7 @@ import mariadb
 
 # Establish a connection to the MariaDB database
 db = mariadb.connect(
-    host="localhost",
+    host="mariadb",
     user="root",
     password="teste123",
     database="iscte_spot"

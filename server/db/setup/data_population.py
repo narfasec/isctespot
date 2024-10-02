@@ -8,7 +8,7 @@ import random
 
 # Database connection
 db = mariadb.connect(
-    host="localhost",
+    host="mariadb",
     user="root",
     password="teste123",
     port=3306,

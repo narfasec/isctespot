@@ -2,7 +2,7 @@ import mariadb
 class DBConnector:
 
     def __init__(self):
-        self.host = 'localhost'
+        self.host = 'mariadb'
         self.user = 'root'
         self.password = 'teste123'
         self.database = 'iscte_spot'
