@@ -18,3 +18,7 @@
 
 # Ignore any other files that might exist in the root directory
 !.gitignore
+
+# Ignore venv
+venv
+.venv
