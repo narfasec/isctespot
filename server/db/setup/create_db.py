@@ -19,7 +19,7 @@ try:
 
     # SQL statements to create the tables
     create_tables_sql = """
-    CREATE TABLE IF NOT EXISTS users (
+    CREATE TABLE IF NOT EXISTS Users (
         UserID INT(11) NOT NULL AUTO_INCREMENT,
         Username VARCHAR(50) NOT NULL COLLATE 'latin1_swedish_ci',
         PasswordHash VARCHAR(255) NOT NULL COLLATE 'latin1_swedish_ci',
@@ -41,7 +41,7 @@ try:
     ENGINE=InnoDB
     AUTO_INCREMENT=1;
 
-    CREATE TABLE IF NOT EXISTS companies (
+    CREATE TABLE IF NOT EXISTS Companies (
         CompanyID INT(11) NOT NULL AUTO_INCREMENT,
         AdminUserID INT(11) NOT NULL,
         NumberOfEmployees INT(11) NULL DEFAULT NULL,
@@ -50,13 +50,13 @@ try:
         CompanyName VARCHAR(255) NOT NULL COLLATE 'latin1_swedish_ci',
         PRIMARY KEY (CompanyID) USING BTREE,
         INDEX AdminUserID (AdminUserID) USING BTREE,
-        CONSTRAINT companies_ibfk_1 FOREIGN KEY (AdminUserID) REFERENCES users (UserID) ON UPDATE RESTRICT ON DELETE RESTRICT
+        CONSTRAINT companies_ibfk_1 FOREIGN KEY (AdminUserID) REFERENCES Users (UserID) ON UPDATE RESTRICT ON DELETE RESTRICT
     )
     COLLATE='latin1_swedish_ci'
     ENGINE=InnoDB
     AUTO_INCREMENT=1;
 
-    CREATE TABLE IF NOT EXISTS clients (
+    CREATE TABLE IF NOT EXISTS Clients (
         ClientID INT(11) NOT NULL AUTO_INCREMENT,
         FirstName VARCHAR(50) NOT NULL COLLATE 'latin1_swedish_ci',
         LastName VARCHAR(50) NOT NULL COLLATE 'latin1_swedish_ci',
@@ -84,13 +84,13 @@ try:
         CreatedAt TIMESTAMP NULL DEFAULT current_timestamp(),
         PRIMARY KEY (ProductID) USING BTREE,
         INDEX CompanyID (CompanyID) USING BTREE,
-        CONSTRAINT products_ibfk_1 FOREIGN KEY (CompanyID) REFERENCES companies (CompanyID) ON UPDATE RESTRICT ON DELETE RESTRICT
+        CONSTRAINT products_ibfk_1 FOREIGN KEY (CompanyID) REFERENCES Companies (CompanyID) ON UPDATE RESTRICT ON DELETE RESTRICT
     )
     COLLATE='latin1_swedish_ci'
     ENGINE=InnoDB
     AUTO_INCREMENT=1;
     
-    CREATE TABLE IF NOT EXISTS sales (
+    CREATE TABLE IF NOT EXISTS Sales (
         SaleID INT(11) NOT NULL AUTO_INCREMENT,
         UserID INT(11) NULL,
         ClientID INT(11) NULL,
@@ -101,8 +101,8 @@ try:
         INDEX UserID (UserID) USING BTREE,
         INDEX ClientID (ClientID) USING BTREE,
         INDEX ProductID (ProductID) USING BTREE,
-        CONSTRAINT sales_ibfk_1 FOREIGN KEY (UserID) REFERENCES users (UserID) ON UPDATE RESTRICT ON DELETE SET NULL,
-        CONSTRAINT sales_ibfk_2 FOREIGN KEY (ClientID) REFERENCES clients (ClientID) ON UPDATE RESTRICT ON DELETE SET NULL,
+        CONSTRAINT sales_ibfk_1 FOREIGN KEY (UserID) REFERENCES Users (UserID) ON UPDATE RESTRICT ON DELETE SET NULL,
+        CONSTRAINT sales_ibfk_2 FOREIGN KEY (ClientID) REFERENCES Clients (ClientID) ON UPDATE RESTRICT ON DELETE SET NULL,
         CONSTRAINT sales_ibfk_3 FOREIGN KEY (ProductID) REFERENCES Products (ProductID) ON UPDATE RESTRICT ON DELETE SET NULL
     )
     COLLATE='latin1_swedish_ci'

@@ -12,7 +12,7 @@ cursor = db.cursor()
 
 def drop_all_tables():
     # Query to get all table names
-    tables = ['sales', 'clients', 'products', 'companies', 'users']
+    tables = ['Sales', 'Clients', 'Products', 'Companies', 'Users']
     # Drop each table
     for table in tables:
         cursor.execute(f"DROP TABLE IF EXISTS {table}")

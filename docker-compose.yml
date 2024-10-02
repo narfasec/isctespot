@@ -26,7 +26,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: teste123
-      MYSQL_DATABASE: isctespot
+      MYSQL_DATABASE: iscte_spot
     ports:
       - "3306:3306"
     volumes:
