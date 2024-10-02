@@ -39,7 +39,7 @@ const handleFileChange = async (event) => {
   formData.append('token', localStorage.getItem('token')) // Replace with actual admin auth token
 
   try {
-    const response = await fetch('http://localhost:5000/update_products', {
+    const response = await fetch(`${API}/update_products`, {
       method: 'POST',
       body: formData,
     })
@@ -75,7 +75,7 @@ const handleFileChange = async (event) => {
 //   }
 
 //   axios
-//     .post('http://localhost:5000/signup', signupPayload)
+//     .post(`${API}/signup`, signupPayload)
 //     .then((response) => {
 //       localStorage.setItem('token', response.data.token)
 //       localStorage.setItem('userId', response.data.user_id)

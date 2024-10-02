@@ -20,7 +20,7 @@ const router = useRouter()
 const invoice = (filename) => {
   filename = 'invoice.pdf'
   axios({
-    url: `http://localhost:5000/invoice?filename=${filename}`,
+    url: `${API}/invoice?filename=${filename}`,
     method: 'GET',
     responseType: 'blob', // Specify responseType as blob to handle binary data
   })

@@ -59,7 +59,7 @@ const submit = () => {
   }
 
   axios
-    .post('http://localhost:5000/clients/new', newClientPayload)
+    .post(`${API}/clients/new`, newClientPayload)
     .then((response) => {
       if (response.status >= 200 && response.status < 300) {
         alert('Client created successfully!');

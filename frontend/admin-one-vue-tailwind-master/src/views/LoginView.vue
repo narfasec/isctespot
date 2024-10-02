@@ -27,7 +27,7 @@ const submit = () => {
   }
 
   axios
-    .post('http://localhost:5000/login', loginPayload)
+    .post(`${API}/login`, loginPayload)
     .then((response) => {
       localStorage.setItem('token', response.data.token)
       localStorage.setItem('userId', response.data.user_id)

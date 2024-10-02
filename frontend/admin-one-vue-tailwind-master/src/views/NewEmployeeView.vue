@@ -46,7 +46,7 @@ const submit = () => {
   }
 
   axios
-    .post('http://localhost:5000/employee/new', newClientPayload)
+    .post(`${API}/employee/new`, newClientPayload)
     .then((response) => {
       if (response.status >= 200 && response.status < 300) {
         alert('Employee created successfully!');

@@ -63,7 +63,7 @@ const deleteEmployee = async (employee) => {
   }
 
   try {
-    await axios.post(`http://localhost:5000/employees/delete`, deleteEmployeePayload)
+    await axios.post(`${API}/employees/delete`, deleteEmployeePayload)
     isModalDangerActive.value = false
     router.push('/employees')
   } catch (error) {
