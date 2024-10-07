@@ -42,7 +42,7 @@ const submitPass = () => {
   }
 
   axios
-    .post('http://localhost:5000/user/reset-password', resetPassPayload)
+    .post(`${API}/user/reset-password`, resetPassPayload)
     .then(() => {
       alert('Password updated!');
     })

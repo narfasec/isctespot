@@ -74,7 +74,7 @@ const menuClick = (event, item) => {
   }
 
   if (item.isLogout) {
-    const url = "http://localhost:5000/logout"
+    const url = `${API}/logout`
     const userLogoutPayload = {
       user_id: Number(localStorage.getItem('userId')),
     };

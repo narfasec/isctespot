@@ -45,7 +45,7 @@ const submit = () => {
   }
 
   axios
-    .post('http://localhost:5000/signup', signupPayload)
+    .post(`${API}/signup`, signupPayload)
     .then((response) => {
       localStorage.setItem('token', response.data.token)
       localStorage.setItem('userId', response.data.user_id)

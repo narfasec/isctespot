@@ -57,7 +57,7 @@ export const useMainStore = defineStore('main', () => {
   }
 
   function getUserInfo() {
-    const url = "http://localhost:5000/user/overview"
+    const url = `${API}/user/overview`
     const userOverviewPayload = {
       user_id: Number(localStorage.getItem('userId')),
       token: localStorage.getItem('token'),
@@ -74,7 +74,7 @@ export const useMainStore = defineStore('main', () => {
   }
 
   function getAdminOverview() {
-    const url = "http://localhost:5000/analytics"
+    const url = `${API}/analytics`
     const adminOverviewPayload = {
       user_id: Number(localStorage.getItem('userId')),
       token: localStorage.getItem('token'),
@@ -93,7 +93,7 @@ export const useMainStore = defineStore('main', () => {
   }
 
   function getClients() {
-    const url = "http://localhost:5000/clients"
+    const url = `${API}/clients`
     const clientsPayload = {
       user_id: Number(localStorage.getItem('userId')),
     };
@@ -108,7 +108,7 @@ export const useMainStore = defineStore('main', () => {
   }
 
   function getCompanyEmployees() {
-    const url = "http://localhost:5000/employees"
+    const url = `${API}/employees`
     const employeesPayload = {
       user_id: localStorage.getItem('userId'),
       token: localStorage.getItem('token'),
@@ -125,7 +125,7 @@ export const useMainStore = defineStore('main', () => {
   }
 
   function getCompanyProducts() {
-    const url = "http://localhost:5000/products"
+    const url = `${API}/products`
     const productsPayload = {
       user_id: localStorage.getItem('userId'),
       token: localStorage.getItem('token'),
@@ -142,7 +142,7 @@ export const useMainStore = defineStore('main', () => {
   }
 
   function getCompanyCashFlow() {
-    const url = "http://localhost:5000/cash-flow"
+    const url = `${API}/cash-flow`
     const cashFlowPayload = {
       country_code: 'PT',
       token: localStorage.getItem('token'),
@@ -160,7 +160,7 @@ export const useMainStore = defineStore('main', () => {
   }
 
   function deleteEmployee(employee_id){
-    const url = "http://localhost:5000/employee/delete"
+    const url = `${API}/employee/delete`
     const employeesPayload = {
       user_id: localStorage.getItem('userId'),
       token: localStorage.getItem('token'),
@@ -179,7 +179,7 @@ export const useMainStore = defineStore('main', () => {
   function editCommission(sellerId, newCommission){
     console.log(sellerId)
     console.log('fodass')
-    const url = "http://localhost:5000/seller/update-commission"
+    const url = `${API}/seller/update-commission`
     const newComissionPayload = {
       user_id: localStorage.getItem('userId'),
       token: localStorage.getItem('token'),
@@ -203,7 +203,7 @@ export const useMainStore = defineStore('main', () => {
       const revenue = sale.SellingPrice * sale.Quantity;
       totalRevenue += revenue;
     });
-  
+
     this.totalRevenue = totalRevenue;
   }
 

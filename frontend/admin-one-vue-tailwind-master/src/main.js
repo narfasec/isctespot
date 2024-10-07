@@ -6,6 +6,8 @@ import router from './router'
 
 import './css/main.css'
 
+window.API = 'http://localhost:5000'
+
 // Init Pinia
 const pinia = createPinia()
 

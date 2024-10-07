@@ -79,7 +79,7 @@ const deleteClient = async (client) => {
 
   }
   try {
-    await axios.post(`http://localhost:5000/clients/delete`, deleteClientPayload)
+    await axios.post(`${API}/clients/delete`, deleteClientPayload)
     // Assuming you refetch the client list after deletion
     mainStore.fetchClients()
     isModalDangerActive.value = false

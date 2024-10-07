@@ -78,7 +78,7 @@ const submit = () => {
   }
 
   axios
-    .post('http://localhost:5000/sales/new', newSalePayload)
+    .post(`${API}/sales/new`, newSalePayload)
     .then((response) => {
       if (response.status >= 200 && response.status < 300) {
         alert('Sale created successfully!');
