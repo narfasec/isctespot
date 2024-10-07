@@ -2,7 +2,7 @@ import mariadb
 class DBConnector:
 
     def __init__(self):
-        self.host = 'localhost'
+        self.host = 'mariadb'
         self.user = 'root'
         self.password = 'teste123'
         self.database = 'iscte_spot'
@@ -457,9 +457,9 @@ class DBConnector:
                 cursor.execute(
                     f"""
                     SELECT SUM(s.Quantity * p.SellingPrice) AS total_sales
-                    FROM sales s
-                    JOIN products p ON s.ProductID = p.ProductID
-                    JOIN users u ON s.UserID = u.UserID
+                    FROM Sales s
+                    JOIN Products p ON s.ProductID = p.ProductID
+                    JOIN Users u ON s.UserID = u.UserID
                     WHERE u.CompanyID = {args};
                     """
                 )

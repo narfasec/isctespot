@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define container name
-containerName="project-server-1"
+containerName="isctespot-server-1"
 
 # Define the paths to your scripts inside the container
 cleanDbScript="/app/db/setup/clean_db.py"
