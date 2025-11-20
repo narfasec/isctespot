@@ -17,7 +17,7 @@ services:
     environment:
       - FLASK_ENV=development
     depends_on:
-      - mariadb
+      - mariadb #Altered
     networks:
       - app-network
 
